@@ -10,6 +10,7 @@ const canvasEl = ref<HTMLCanvasElement | null>(null)
 let rafId: number | null = null
 let removeMouseListener: (() => void) | null = null
 let removeResizeListener: (() => void) | null = null
+let resizeObserver: ResizeObserver | null = null
 
 const VS = `attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`
 
@@ -115,12 +116,22 @@ onMounted(() => {
     const rect = canvas.getBoundingClientRect()
     const w = Math.max(rect.width, 1)
     const h = Math.max(rect.height, 1)
-    canvas.width = Math.round(w * dpr)
-    canvas.height = Math.round(h * dpr)
-    gl.viewport(0, 0, canvas.width, canvas.height)
+    const nextW = Math.round(w * dpr)
+    const nextH = Math.round(h * dpr)
+    if (canvas.width !== nextW || canvas.height !== nextH) {
+      canvas.width = nextW
+      canvas.height = nextH
+      gl.viewport(0, 0, canvas.width, canvas.height)
+    }
   }
   window.addEventListener('resize', resize)
   removeResizeListener = () => window.removeEventListener('resize', resize)
+  // ResizeObserver catches the case where the canvas is mounted at 0x0 (because
+  // its slide is hidden) and only gets dimensions once the user navigates to it.
+  // Without this, navigating to a hero slide for the first time after page load
+  // shows no animation until a manual refresh.
+  resizeObserver = new ResizeObserver(resize)
+  resizeObserver.observe(canvas)
   resize()
 
   const onMouseMove = (e: MouseEvent) => {
@@ -146,6 +157,8 @@ onUnmounted(() => {
   if (rafId !== null) cancelAnimationFrame(rafId)
   removeMouseListener?.()
   removeResizeListener?.()
+  resizeObserver?.disconnect()
+  resizeObserver = null
 })
 </script>
 
