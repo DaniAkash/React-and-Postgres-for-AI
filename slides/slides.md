@@ -219,7 +219,11 @@ class: 'dark'
       <div v-click="1" style="position:absolute;inset:0">
         <div class="terminal" aria-label="monolith stress trace">
           <span class="line"><span class="prompt">$</span> pm2 status</span>
-          <span class="line dim">  app &nbsp;&middot;&nbsp; uptime 4h &nbsp;&middot;&nbsp; mem 1.8g &nbsp;&middot;&nbsp; 1 process</span>
+          <span class="line dim">+-----+-------+--------+--------+</span>
+          <span class="line dim">| id  | name  | uptime | memory |</span>
+          <span class="line dim">+-----+-------+--------+--------+</span>
+          <span class="line">| 0   | app   | 4h     | 1.8g   |</span>
+          <span class="line dim">+-----+-------+--------+--------+</span>
           <span class="line" style="margin-top:1.4vh"><span class="prompt">$</span> tail -f app.log</span>
           <span class="line dim">12:04:01 &nbsp;api &nbsp;POST /search &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;200 &nbsp;12ms</span>
           <span class="line dim">12:04:02 &nbsp;api &nbsp;POST /search &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;200 &nbsp;14ms</span>
