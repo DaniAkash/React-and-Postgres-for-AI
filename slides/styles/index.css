@@ -416,6 +416,18 @@ em { font-style: italic; font-family: var(--serif-en); }
   font-family: var(--serif-en);
   letter-spacing: -0.025em;
 }
+/* UnoCSS (slidev's atomic engine) interprets the `h-` prefix as a height
+   utility, so `.h-xl` resolves to height: 36rem and `.h-md` to a fixed
+   height too. Force height back to auto on every type class so they only
+   carry the font properties we declared. */
+.slidev-layout .h-hero,
+.slidev-layout .h-xl,
+.slidev-layout .h-sub,
+.slidev-layout .h-md,
+.slidev-layout .h-hero-en,
+.slidev-layout .h-xl-en {
+  height: auto !important;
+}
 .slidev-layout .display {
   font-family: var(--serif-en);
   font-weight: 700;

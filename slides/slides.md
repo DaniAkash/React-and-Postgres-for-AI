@@ -34,7 +34,7 @@ htmlAttrs:
 
 <div class="slide-shell">
   <WebGLBackground variant="dark" />
-  <div class="chrome"><div>Expert Talks &middot; Dani Akash</div><div>01 / 16</div></div>
+  <div class="chrome"><div>Expert Talks &middot; Dani Akash</div><ChromeCounter /></div>
   <div class="frame" style="display:grid;grid-template-columns:1.05fr .95fr;gap:5vw;align-items:center;height:100%">
     <div>
       <div class="kicker">REACT + POSTGRES</div>
@@ -58,11 +58,68 @@ htmlAttrs:
 <!-- ============================================================ -->
 
 ---
+class: 'dark'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>Expert Talks &middot; Dani Akash</div><ChromeCounter /></div>
+  <div class="frame grid-2-6-6" style="padding-top:5vh">
+    <div>
+      <div class="kicker">INTRODUCTIONS</div>
+      <h2 class="h-xl" style="font-size:5.4vw">Hi, I'm Dani.</h2>
+      <div style="font-family:var(--serif-en);font-weight:500;font-size:2vw;line-height:1.25;opacity:0.78;margin-top:1.2vh">Founding Engineer at BrowserOS (YC S24)</div>
+      <p class="lead" style="margin-top:3.4vh;max-width:34vw">I build browsers, terminals, and AI assistants. The seams where humans and agents meet.</p>
+    </div>
+    <div>
+      <div class="kicker" style="margin-bottom:2vh">CURRENT OPEN SOURCE WORK</div>
+      <div style="display:flex;flex-direction:column;gap:2.2vh">
+        <div v-click style="display:grid;grid-template-columns:auto 1fr;gap:1vw;align-items:baseline">
+          <div style="font-size:1.6vw;line-height:1">&#127760;</div>
+          <div>
+            <div style="font-family:var(--serif-en);font-weight:600;font-size:1.55vw;line-height:1.2">BrowserOS</div>
+            <div style="font-family:var(--sans-body);font-size:max(13px,0.98vw);opacity:0.72;line-height:1.45;margin-top:0.3vh">Open-source agentic browser. Let AI see, click, and ship the boring tabs for you.</div>
+          </div>
+        </div>
+        <div v-click style="display:grid;grid-template-columns:auto 1fr;gap:1vw;align-items:baseline">
+          <div style="font-size:1.6vw;line-height:1">&#128223;</div>
+          <div>
+            <div style="font-family:var(--serif-en);font-weight:600;font-size:1.55vw;line-height:1.2">Agent Terminal</div>
+            <div style="font-family:var(--sans-body);font-size:max(13px,0.98vw);opacity:0.72;line-height:1.45;margin-top:0.3vh">A terminal where coding agents are first-class citizens, not bolted-on guests.</div>
+          </div>
+        </div>
+        <div v-click style="display:grid;grid-template-columns:auto 1fr;gap:1vw;align-items:baseline">
+          <div style="font-size:1.6vw;line-height:1">&#129302;</div>
+          <div>
+            <div style="font-family:var(--serif-en);font-weight:600;font-size:1.55vw;line-height:1.2">Herbie</div>
+            <div style="font-family:var(--sans-body);font-size:max(13px,0.98vw);opacity:0.72;line-height:1.45;margin-top:0.3vh">Your personal Agent Command Center. One UI for all AI Agents.</div>
+          </div>
+        </div>
+        <div v-click style="display:grid;grid-template-columns:auto 1fr;gap:1vw;align-items:baseline">
+          <div style="font-size:1.6vw;line-height:1">&#129525;</div>
+          <div>
+            <div style="font-family:var(--serif-en);font-weight:600;font-size:1.55vw;line-height:1.2">acpx-tools</div>
+            <div style="font-family:var(--sans-body);font-size:max(13px,0.98vw);opacity:0.72;line-height:1.45;margin-top:0.3vh">Headless ACP toolkit. Talk to coding agents over the protocol, no UI required.</div>
+          </div>
+        </div>
+        <div v-click style="display:grid;grid-template-columns:auto 1fr;gap:1vw;align-items:baseline">
+          <div style="font-size:1.6vw;line-height:1">&#127912;</div>
+          <div>
+            <div style="font-family:var(--serif-en);font-weight:600;font-size:1.55vw;line-height:1.2">stylecn</div>
+            <div style="font-family:var(--sans-body);font-size:max(13px,0.98vw);opacity:0.72;line-height:1.45;margin-top:0.3vh">Brand-themed presets for shadcn/ui. Apple, Stripe, Linear, Airbnb. Copy the CSS, ship the look.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div class="title">Building at the seams</div><div>ABOUT</div></div>
+</div>
+
+---
 class: 'light'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Problem &middot; Service Sprawl</div><div>02 / 16</div></div>
+  <div class="chrome"><div>Problem &middot; Service Sprawl</div><ChromeCounter /></div>
   <div class="frame" style="padding-top:5vh">
     <div class="kicker">THE JUNK DRAWER ARCHITECTURE</div>
     <h2 class="h-xl" style="font-size:4.4vw">AI features tend to arrive with a small country of infrastructure.</h2>
@@ -84,7 +141,7 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Architecture &middot; Baseline</div><div>03 / 16</div></div>
+  <div class="chrome"><div>Architecture &middot; Baseline</div><ChromeCounter /></div>
   <div class="frame grid-2-6-6" style="padding-top:6vh">
     <div class="col" style="justify-content:space-between;min-height:66vh">
       <div>
@@ -108,7 +165,7 @@ class: 'light'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Architecture &middot; Sprawl</div><div>04 / 16</div></div>
+  <div class="chrome"><div>Architecture &middot; Sprawl</div><ChromeCounter /></div>
   <div class="frame" style="padding-top:5vh">
     <div class="kicker">OPTION 02</div>
     <h2 class="h-xl" style="font-size:5.2vw">Microservices solve the pressure by distributing the pain.</h2>
@@ -137,7 +194,7 @@ class: 'hero light'
 
 <div class="slide-shell">
   <WebGLBackground variant="light" />
-  <div class="chrome"><div>Turn &middot; Platform</div><div>05 / 16</div></div>
+  <div class="chrome"><div>Turn &middot; Platform</div><ChromeCounter /></div>
   <div class="frame" style="display:grid;gap:4vh;align-content:center;height:100%">
     <div class="kicker">THE TURN</div>
     <h1 class="h-hero" style="font-size:6.8vw">Postgres stopped being just a database.</h1>
@@ -152,7 +209,7 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Stack &middot; Map</div><div>06 / 16</div></div>
+  <div class="chrome"><div>Stack &middot; Map</div><ChromeCounter /></div>
   <div class="frame" style="padding-top:5vh">
     <div class="kicker">OPTION 03</div>
     <h2 class="h-xl" style="font-size:4.2vw">The Postgres + React Server Components approach collapses layers.</h2>
@@ -176,7 +233,7 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; Auth</div><div>07 / 16</div></div>
+  <div class="chrome"><div>Capability &middot; Auth</div><ChromeCounter /></div>
   <div class="frame grid-2-7-5" style="padding-top:6vh">
     <div>
       <div class="kicker">AUTH WITHOUT A SERVICE</div>
@@ -201,7 +258,7 @@ class: 'light'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; Vectors</div><div>08 / 16</div></div>
+  <div class="chrome"><div>Capability &middot; Vectors</div><ChromeCounter /></div>
   <div class="frame grid-2-6-6" style="padding-top:6vh">
     <div>
       <div class="kicker">VECTOR SEARCH WITHOUT A VECTOR DATABASE</div>
@@ -226,7 +283,7 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; Realtime</div><div>09 / 16</div></div>
+  <div class="chrome"><div>Capability &middot; Realtime</div><ChromeCounter /></div>
   <div class="frame" style="padding-top:5vh">
     <div class="kicker">REALTIME DIRECTLY IN THE DB</div>
     <h2 class="h-xl" style="font-size:4.6vw">For many agent workflows, live updates are database events.</h2>
@@ -249,7 +306,7 @@ class: 'light'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; Background Work</div><div>10 / 16</div></div>
+  <div class="chrome"><div>Capability &middot; Background Work</div><ChromeCounter /></div>
   <div class="frame grid-2-7-5" style="padding-top:6vh">
     <div>
       <div class="kicker">BACKGROUND JOBS SIMPLIFIED</div>
@@ -274,7 +331,7 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; Retrieval</div><div>11 / 16</div></div>
+  <div class="chrome"><div>Capability &middot; Retrieval</div><ChromeCounter /></div>
   <div class="frame" style="padding-top:5vh">
     <div class="kicker">RAG WITHOUT THE COMPLEXITY</div>
     <h2 class="h-xl" style="font-size:4.8vw">Most retrieval is not pure vector search. It is filtered, ranked, permissioned search.</h2>
@@ -296,7 +353,7 @@ class: 'light'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; APIs</div><div>12 / 16</div></div>
+  <div class="chrome"><div>Capability &middot; APIs</div><ChromeCounter /></div>
   <div class="frame grid-2-6-6" style="padding-top:6vh">
     <div>
       <div class="kicker">APIS WITHOUT WRITING EVERY API</div>
@@ -319,7 +376,7 @@ class: 'hero dark'
 
 <div class="slide-shell">
   <WebGLBackground variant="dark" />
-  <div class="chrome"><div>React &middot; Server Components</div><div>13 / 16</div></div>
+  <div class="chrome"><div>React &middot; Server Components</div><ChromeCounter /></div>
   <div class="frame" style="display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:center;height:100%">
     <div>
       <div class="kicker">THE REACT SHIFT</div>
@@ -342,7 +399,7 @@ class: 'light'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Result &middot; Side-by-side</div><div>14 / 16</div></div>
+  <div class="chrome"><div>Result &middot; Side-by-side</div><ChromeCounter /></div>
   <div class="frame" style="padding-top:5vh">
     <div class="kicker">COMPARE THE SHAPE</div>
     <h2 class="h-xl" style="font-size:5vw">Same AI product. Three architecture profiles.</h2>
@@ -363,7 +420,7 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Reality &middot; Tradeoffs</div><div>15 / 16</div></div>
+  <div class="chrome"><div>Reality &middot; Tradeoffs</div><ChromeCounter /></div>
   <div class="frame" style="padding-top:5vh">
     <div class="kicker">WHERE THIS BREAKS DOWN</div>
     <h2 class="h-xl" style="font-size:4.9vw">Postgres can do ten jobs well enough. It should not do every job forever.</h2>
@@ -383,7 +440,7 @@ class: 'hero light'
 
 <div class="slide-shell">
   <WebGLBackground variant="light" />
-  <div class="chrome"><div>Close &middot; Takeaway</div><div>16 / 16</div></div>
+  <div class="chrome"><div>Close &middot; Takeaway</div><ChromeCounter /></div>
   <div class="frame" style="display:grid;gap:5vh;align-content:center;height:100%">
     <div class="kicker">THE RULE OF THUMB</div>
     <h1 class="h-hero" style="font-size:6.6vw">Start with the boring thing that removes glue.</h1>
