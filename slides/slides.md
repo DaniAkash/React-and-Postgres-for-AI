@@ -124,22 +124,22 @@ class: 'light'
     <div class="kicker">THE PARTS LIST</div>
     <h2 class="h-xl" style="font-size:5vw">How to make an app AI-ready?</h2>
     <div class="grid-4" style="margin-top:5vh">
-      <div class="cap-card">
+      <div class="cap-card" v-click>
         <div class="cap-header"><div class="cap-emoji">&#128272;</div><div class="cap-name">Authentication</div></div>
         <div class="cap-row cap-why"><span class="cap-label">Why</span>Agents act on behalf of a real user; the data layer needs to know which user and what they may touch.</div>
         <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>A personal AI assistant that reads YOUR inbox, not someone else's.</div>
       </div>
-      <div class="cap-card">
+      <div class="cap-card" v-click>
         <div class="cap-header"><div class="cap-emoji">&#128268;</div><div class="cap-name">REST / GraphQL APIs</div></div>
         <div class="cap-row cap-why"><span class="cap-label">Why</span>Both the UI and the agent need typed, discoverable endpoints to call.</div>
         <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>An agent tool surface the LLM can introspect and invoke without hand-written glue.</div>
       </div>
-      <div class="cap-card">
+      <div class="cap-card" v-click>
         <div class="cap-header"><div class="cap-emoji">&#128450;&#65039;</div><div class="cap-name">Structured data</div></div>
         <div class="cap-row cap-why"><span class="cap-label">Why</span>Filtering, joining, and aggregating real business rows is what most useful AI actually does.</div>
         <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>"Chat with your invoices": the agent runs filtered queries over real customer records.</div>
       </div>
-      <div class="cap-card">
+      <div class="cap-card" v-click>
         <div class="cap-header"><div class="cap-emoji">&#128196;</div><div class="cap-name">Unstructured data</div></div>
         <div class="cap-row cap-why"><span class="cap-label">Why</span>Agent state, tool calls, citations, and intermediate reasoning don't fit neat columns.</div>
         <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>Save and replay a full agent run, including every tool call and message.</div>
@@ -158,22 +158,22 @@ class: 'light'
   <div class="frame" style="padding-top:5vh">
     <div class="kicker">&hellip;continued</div>
     <div class="grid-4" style="margin-top:3vh">
-      <div class="cap-card">
+      <div class="cap-card" v-click>
         <div class="cap-header"><div class="cap-emoji">&#9203;</div><div class="cap-name">Queues</div></div>
         <div class="cap-row cap-why"><span class="cap-label">Why</span>Embedding, summarisation, and ingestion take seconds to minutes; the UI cannot wait.</div>
         <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>Background indexing of new docs into RAG without blocking chat.</div>
       </div>
-      <div class="cap-card">
+      <div class="cap-card" v-click>
         <div class="cap-header"><div class="cap-emoji">&#128269;</div><div class="cap-name">Search</div></div>
         <div class="cap-row cap-why"><span class="cap-label">Why</span>Vector finds "things like this"; full-text finds exact names and IDs; both must respect tenant + permissions.</div>
         <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>Hybrid retrieval across support tickets. Meaning AND product-name matches, filtered by org.</div>
       </div>
-      <div class="cap-card">
+      <div class="cap-card" v-click>
         <div class="cap-header"><div class="cap-emoji">&#129521;</div><div class="cap-name">Type-safety</div></div>
         <div class="cap-row cap-why"><span class="cap-label">Why</span>One schema change should not silently break four downstream services; agents need stable contracts too.</div>
         <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>MCP tool schemas derived from the DB schema. Never out of sync with the data.</div>
       </div>
-      <div class="cap-card">
+      <div class="cap-card" v-click>
         <div class="cap-header"><div class="cap-emoji">&#128225;</div><div class="cap-name">Realtime updates</div></div>
         <div class="cap-row cap-why"><span class="cap-label">Why</span>Agents stream tokens; jobs change state; UIs need to react without polling.</div>
         <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>Live "thinking &rarr; calling tool &rarr; drafting" status as the agent works.</div>
