@@ -68,19 +68,30 @@ void main(){
   vec2 p=uv;p.x*=u_resolution.x/u_resolution.y;
   vec2 m=u_mouse;m.x*=u_resolution.x/u_resolution.y;
   vec2 md=p-m;float dl=length(md);
-  p+=normalize(md+vec2(0.0001))*exp(-dl*5.0)*0.03;
+  p+=normalize(md+vec2(0.0001))*exp(-dl*5.0)*0.06;
+  // Domain-warped fbm for a marbled-paper / endpaper feel.
   vec2 q=vec2(fbm(p*1.8+u_time*0.07),fbm(p*1.8+vec2(5.2,1.3)+u_time*0.06));
-  vec2 r=vec2(fbm(p*2.0+q*1.3+vec2(1.7,9.2)+u_time*0.05),
-              fbm(p*2.0+q*1.3+vec2(8.3,2.8)+u_time*0.04));
-  float f=fbm(p*2.2+r*1.5);
-  vec3 silverDark=vec3(0.86,0.85,0.84);
-  vec3 paper=vec3(0.955,0.945,0.925);
-  vec3 col=mix(silverDark,paper,f);
-  float ph=r.x*2.2+u_time*0.35;
-  col+=vec3(0.78,0.62,0.92)*sin(ph)*0.055;
-  col+=vec3(0.55,0.72,0.95)*sin(ph*0.8+2.0)*0.05;
-  float hl=smoothstep(0.48,0.92,f);
-  col+=hl*0.06;
+  vec2 r=vec2(fbm(p*2.0+q*2.0+vec2(1.7,9.2)+u_time*0.05),
+              fbm(p*2.0+q*2.0+vec2(8.3,2.8)+u_time*0.04));
+  float f=fbm(p*2.2+r*2.2);
+  // Wider brightness range so the marbling has real contrast against the page.
+  vec3 deepSilver=vec3(0.62,0.60,0.66);
+  vec3 lavenderMist=vec3(0.78,0.76,0.84);
+  vec3 paper=vec3(0.97,0.96,0.94);
+  vec3 col=mix(deepSilver,paper,smoothstep(0.15,0.85,f));
+  col=mix(col,lavenderMist,smoothstep(0.45,0.62,f)*0.55);
+  // Pastel veins: lavender, sky, warm peach. Stronger than the original so the
+  // texture reads from across a room.
+  float ph=r.x*2.6+u_time*0.32;
+  col+=vec3(0.62,0.42,0.85)*sin(ph)*0.10;
+  col+=vec3(0.40,0.60,0.95)*sin(ph*0.85+2.1)*0.09;
+  col+=vec3(0.95,0.62,0.50)*sin(ph*0.65+4.2)*0.06;
+  // Sharper highlight ridge along high-density fbm regions.
+  float hl=smoothstep(0.55,0.92,f);
+  col+=hl*0.08;
+  // Soft darker ridge along the low fbm regions, anchors the marbling.
+  float lo=smoothstep(0.35,0.10,f);
+  col-=lo*vec3(0.10,0.10,0.08);
   gl_FragColor=vec4(col,1.0);
 }`
 

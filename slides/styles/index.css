@@ -93,7 +93,7 @@ html, body { background: var(--ink); }
 }
 .slidev-layout.light .slide-shell::before { background: rgba(var(--paper-rgb), 0.88); backdrop-filter: blur(3px); }
 .slidev-layout.dark  .slide-shell::before { background: rgba(var(--ink-rgb),   0.84); backdrop-filter: blur(3px); }
-.slidev-layout.hero.light .slide-shell::before { background: rgba(var(--paper-rgb), 0.22); backdrop-filter: none; }
+.slidev-layout.hero.light .slide-shell::before { background: rgba(var(--paper-rgb), 0.14); backdrop-filter: none; }
 .slidev-layout.hero.dark  .slide-shell::before { background: rgba(var(--ink-rgb),   0.20); backdrop-filter: none; }
 
 /* Hero slides fade subtly at top/bottom for chrome and foot legibility */
