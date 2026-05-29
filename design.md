@@ -1,9 +1,9 @@
 # React + Postgres - Style Reference
-> Editorial field-report aesthetic. Dark and light spreads alternate against animated WebGL backdrops, anchored by a single volt-green accent.
+> Editorial field-report aesthetic. Dark and light spreads alternate over flat ink and paper, with an animated WebGL backdrop reserved for the four hero spreads and anchored by a single volt-green accent.
 
 **Theme:** dark-led (with light spreads as counterweight)
 
-This deck reads like a printed field report rendered on a CRT. The base canvas is a near-black ink with a paper-cream counterpart for "turn" pages, both sitting on top of slow, painterly WebGL backgrounds: holographic dispersion on dark spreads, a silver-paper spiral vortex on light ones. Typography does the heavy lifting. Playfair Display drives display headlines with negative tracking and serif italic accents, while IBM Plex Mono works as the magazine chrome - kickers, footers, terminal blocks, metadata. The whole composition feels intentionally analog and editorial, with a single electric color (volt-green) reserved for the moments that matter.
+This deck reads like a printed field report rendered on a CRT. The base canvas is a near-black ink with a paper-cream counterpart for "turn" pages. Body slides sit on those flat colors. The four hero spreads (title, turn, RSC shift, close) instead sit on top of a slow, painterly WebGL backdrop: holographic dispersion on the dark heroes, marbled paper with lavender veins on the light heroes. Typography does the heavy lifting. Playfair Display drives display headlines with negative tracking and serif italic accents, while IBM Plex Mono works as the magazine chrome - kickers, footers, terminal blocks, metadata. The whole composition feels intentionally analog and editorial, with a single electric color (volt-green) reserved for the moments that matter.
 
 ## Tokens - Colors
 
@@ -22,6 +22,11 @@ This deck reads like a printed field report rendered on a CRT. The base canvas i
 | Volt White | `#f2f2f2` | `--volt-white` | Primary text inside terminal and node surfaces. |
 | Warn | `#ffba00` | inline | Terminal warning lines. Use sparingly. |
 | Bad | `#fb565b` | inline | Terminal error lines. Use sparingly. |
+| Deep Silver | `#9e9aa9` | shader-only | Low end of the light hero WebGL marbling. Never reach for as a UI color. |
+| Lavender Mist | `#c7c2d6` | shader-only | Mid-tone weave in the light hero WebGL marbling. Shader-internal. |
+| Marble Lavender | `#9e6bd9` | shader-only | Pastel vein in the light hero shader. Shader-internal. |
+| Marble Sky | `#669af2` | shader-only | Pastel vein in the light hero shader. Shader-internal. |
+| Marble Peach | `#f29e80` | shader-only | Warm pastel vein in the light hero shader. Shader-internal. |
 
 ### Accent gradient
 
@@ -76,7 +81,7 @@ Reserve `.accent` for a single highlighted word per hero slide. Never apply it t
 | h-md | `.h-md` | 2.3vw | 1.3 | - |
 | h-sub | `.h-sub` | 3.1vw | 1.25 | - |
 | h-xl | `.h-xl` | 6.2vw (often overridden) | 1.08 | -0.01em |
-| h-hero | `.h-hero` | 10vw (often overridden 7-9vw) | 0.96 | -0.02em |
+| h-hero | `.h-hero` | 10vw default, hero slides override to 4.2-6.8vw at 1920px canvas | 1.05 | -0.02em |
 | display | `.display` | 11vw | 0.92 | -0.025em |
 | big numeral | `.big-num`, `.stat .n` | 8vw - 10vw | 0.85 - 0.88 | -0.03em |
 | ghost numeral | `.ghost` | 34vw | 0.8 | -0.04em (6% opacity decorative) |
@@ -85,7 +90,7 @@ Reserve `.accent` for a single highlighted word per hero slide. Never apply it t
 
 **Base unit:** viewport-relative. Padding, gaps, and type scale use `vw`/`vh` so the deck renders at any aspect ratio without layout collapse.
 
-**Density:** spacious. Magazine-like breathing room - hero slides use a full 80vh `.frame`, body slides pad 5-6vh top.
+**Density:** spacious. Magazine-like breathing room. The slide canvas itself is fixed at 1920x1080 via slidev's `canvasWidth: 1920`, and `.slide-shell` fills it via `position: absolute; inset: 0` so every slide is full-bleed regardless of layout. Body slides pad 6% on all sides; hero slides keep the same shell but use lighter overlays so the WebGL backdrop reads through.
 
 ### Spacing scale (in use, not arbitrary)
 
@@ -129,7 +134,13 @@ Reserve `.accent` for a single highlighted word per hero slide. Never apply it t
 ### Slide Shell
 **Role:** Every spread
 
-Outer `<section class="slide [hero] [light|dark]">` with three children: `.chrome` (top), `.frame` (middle, takes remaining space), `.foot` (bottom). The `.slide::before` overlay applies a 78-88% paper/ink wash for legibility on body slides; `.slide.hero::before` drops to 16-22% so the WebGL background bleeds through.
+Outer `<div class="slide-shell">` inside a slidev slide with `class: '[hero] [light|dark]'` frontmatter (which gets applied to `.slidev-layout`). The shell holds three children in order: `.chrome` (top), `.frame` (middle, takes remaining space), `.foot` (bottom). On hero slides the shell also nests a `<WebGLBackground variant="dark|light" />` component as its first child - that canvas paints under the chrome/frame/foot via DOM order (the three content blocks are `position: relative; z-index: 1` to stay on top of the absolute-positioned canvas).
+
+The `.slide-shell::before` overlay applies a wash for legibility:
+- Body `.dark`: 84% ink (full coverage; no WebGL underneath anyway)
+- Body `.light`: 88% paper (full coverage)
+- Hero `.dark`: 20% ink (lets the holographic shader read through)
+- Hero `.light`: 14% paper (lets the marbled-paper shader read through)
 
 ### Chrome Bar
 **Role:** Magazine masthead
@@ -191,12 +202,18 @@ Flex wrap row of `.chip` pills - mono uppercase 0.12em, 999px radius, 1px curren
 
 `.big-num` (10vw heavy) and `.ghost` (34vw at 6% opacity, absolutely positioned) provide silent typographic anchors. Use sparingly - one per slide max.
 
+### WebGL Background
+**Role:** Hero-spread atmosphere
+
+`<WebGLBackground variant="dark" | "light" />` from `slides/components/WebGLBackground.vue`. Mounts a `<canvas position: absolute; inset: 0>` inside `.slide-shell`, runs one of two fragment shaders, and ties its lifecycle to slidev via `onSlideEnter` / `onSlideLeave` from `@slidev/client` (so the rAF loop only burns CPU on the active hero slide). Used **only** on slides 1, 5, 13, 16. Body slides do not get the component - their backdrop is flat ink or paper.
+
 ## Do's and Don'ts
 
 ### Do
 - Lead every spread with the chrome + frame + foot triad. The deck reads as a printed magazine; chrome is the recurring identity.
 - Reserve `volt-green` (`#00d992`) for moments of truth: one accent word per hero, terminal prompts, hot nodes. Apply the glow filter (`drop-shadow(0 0 6px rgba(0,217,146,0.42))`) when used as text.
-- Alternate dark and light spreads. Adjacent dark slides flatten the rhythm; the silver-paper light spreads exist specifically to give the WebGL palette a counter-beat.
+- Alternate dark and light spreads. Adjacent dark slides flatten the rhythm; the marbled-paper light spreads exist specifically to give the deck a counter-beat.
+- Reserve the WebGL backdrop for hero spreads only. Body slides need legibility-first flat surfaces; layering the canvas under every slide muddies the rhythm and makes the heroes feel less special.
 - Use Playfair Display for every headline at 5vw and up, with negative letter-spacing baked into `.h-hero`, `.h-xl`, `.display`. Tighter tracking is part of the editorial voice.
 - Use IBM Plex Mono uppercase with at least 0.16em tracking for every kicker, chrome label, foot label, stat-card label, image caption, and chip. Tight mono is incorrect at this scale.
 - Keep terminal blocks honest: real-looking SQL or shell. The terminal is a content surface, not decoration.
@@ -208,7 +225,8 @@ Flex wrap row of `.chip` pills - mono uppercase 0.12em, 999px radius, 1px curren
 - Never use black `#000` for ink or pure white `#fff` for paper. The deck uses `#050507` and `#f2f2f2` to keep the WebGL backdrop visible.
 - Never apply hard shadows or saturated drop-shadows. Elevation comes from the WebGL gradient and subtle 1px borders, not from CSS lift effects.
 - Never mix sentence case with the all-caps mono chrome. Chrome, kickers, footers, captions are always uppercase with generous tracking.
-- Never pack a hero slide. Heros use lighter overlays so the WebGL shows through; over-stuffed heros muddy the painterly background.
+- Never pack a hero slide. Heros use lighter overlays (14-20%) so the WebGL shows through; over-stuffed heros muddy the painterly background.
+- Never put `<WebGLBackground />` on a body slide. The component is intentionally scoped to slides 1, 5, 13, and 16 only.
 - Never use em-dashes in slide copy. The deck reads as carefully edited; em-dashes are an AI tell.
 
 ## Elevation
@@ -220,12 +238,12 @@ Flex wrap row of `.chip` pills - mono uppercase 0.12em, 999px radius, 1px curren
 
 ## Imagery
 
-The visual atmosphere is generated, not photographic. Two WebGL fragment shaders bathe the deck:
+The visual atmosphere is generated, not photographic. Two WebGL fragment shaders live in `slides/components/WebGLBackground.vue` and are mounted only on the four hero spreads (slides 1, 5, 13, 16). The other twelve slides sit on flat ink or paper.
 
-- **Dark shader (Holographic Dispersion):** subtle rainbow perturbations driven by mouse position, layered cosine palettes, and a softly pulsing highlight. Looks like a hot foil chrome plate catching ambient light.
-- **Light shader (Spiral Vortex):** domain-warped FBM noise in silver-paper tones, with low-intensity violet/blue refractions and a mouse-radial repulsion field. Looks like brushed metal under a soft sky.
+- **Dark shader (Holographic Dispersion):** subtle rainbow perturbations driven by mouse position, layered cosine palettes, and a softly pulsing highlight. Looks like a hot foil chrome plate catching ambient light. Used on slides 1 and 13.
+- **Light shader (Marbled Paper):** domain-warped FBM noise with a wide brightness range (deep silver to paper), a lavender-mist mid-tone weave, and three pastel veins (marble lavender, marble sky, marble peach). Mouse-radial repulsion adds gentle parallax. Reads like Italian endpaper from across the room. Used on slides 5 and 16.
 
-Both shaders animate at requestAnimationFrame, so motion is constant but slow enough to read as ambient. Body class `.light-bg` cross-fades the canvases over 1.2s when the active slide switches theme. No raster photography. No icon imagery except the optional Lucide outline icons at 1.4 stroke weight.
+Both shaders animate at requestAnimationFrame. Slidev's `onSlideEnter` / `onSlideLeave` hooks start and stop each loop so only the active hero spread is burning CPU. The rAF loop reuses the WebGL context across activations (cheap), and `canvas.width` / `canvas.height` only get reassigned when the rendered size actually changes (because reassigning them clears the drawing buffer). No raster photography. No icon imagery except the optional Lucide outline icons at 1.4 stroke weight.
 
 ## Layout
 
@@ -246,7 +264,7 @@ Reading order is left-to-right, top-to-bottom, with the chrome line and foot lin
 
 ### Example component prompts
 
-1. **Create a hero slide:** Wrap in `<section class="slide hero dark">`. Add `<div class="chrome">` with a left slug ("Field Report . AI Apps") and a right page counter ("01 / 16"). Inside `<div class="frame">`, split 1.05fr / 0.95fr. Left column: `.kicker` mono uppercase, then `<h1 class="h-hero h-hero-en">` with one word wrapped in `<span class="accent">`. Below it a `.lead` paragraph capped at 52vw, then a `.meta-row` chip-style mono row. Right column: a `Terminal` block of 4-5 lines including one `<span class="prompt">$</span>` line. Close with `<div class="foot">` showing the spread's editorial title and a right-side section label.
+1. **Create a hero slide:** Use slide frontmatter `class: 'hero dark'` (or `'hero light'`) and wrap the slide content in `<div class="slide-shell">`. Drop `<WebGLBackground variant="dark" />` (or `"light"`) as the first child of the shell. Then add `<div class="chrome">` with a left slug ("Field Report . AI Apps") and a right page counter ("01 / 16"). Inside `<div class="frame">`, split 1.05fr / 0.95fr. Left column: `.kicker` mono uppercase, then `<h1 class="h-hero h-hero-en">` with one word wrapped in `<span class="accent">`. Below it a `.lead` paragraph capped at 52vw, then a `.meta-row` chip-style mono row. Right column: a Terminal block of 4-5 lines including one `<span class="prompt">$</span>` line. Close with `<div class="foot">` showing the spread's editorial title and a right-side section label.
 
 2. **Create a stat-card grid for problems:** On a light spread, after the kicker and h-xl headline, add `<div class="grid-6">`. Render six `.stat-card` blocks: label (mono uppercase), `.stat-nb` Playfair numeral with a tiny `.stat-unit`, and a one-line `.stat-note`. Use this for "junk drawer" enumerations - never for more than 6 items.
 
@@ -254,7 +272,7 @@ Reading order is left-to-right, top-to-bottom, with the chrome line and foot lin
 
 4. **Create a comparison row:** `<div class="compare">` with three `.colbox` children. Each opens with an `<h3>` in Playfair at 2vw and a single-paragraph `<p>` at ~78% opacity. Three columns is the right count; four feels cramped on widescreen.
 
-5. **Create a closing slide:** Use `<section class="slide hero light">`. Center a giant `.h-hero` headline, a single `.lead` paragraph, and a small Terminal showing 3 takeaway lines prefixed with `$`. Skip chips. Skip stat cards. The close should feel quiet.
+5. **Create a closing slide:** Use slide frontmatter `class: 'hero light'`, wrap in `<div class="slide-shell">`, drop `<WebGLBackground variant="light" />` as the first child. Center a giant `.h-hero` headline, a single `.lead` paragraph, and a small Terminal showing 3 takeaway lines prefixed with `$`. Skip chips. Skip stat cards. The close should feel quiet.
 
 ## Similar Brands
 
