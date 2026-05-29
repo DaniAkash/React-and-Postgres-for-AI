@@ -62,7 +62,7 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Expert Talks &middot; Dani Akash</div><ChromeCounter /></div>
+  <div class="chrome"><div>Speaker &middot; About</div><ChromeCounter /></div>
   <div class="frame grid-2-6-6" style="padding-top:5vh">
     <div>
       <div class="kicker">INTRODUCTIONS</div>
