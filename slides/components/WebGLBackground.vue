@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
+// @ts-ignore — slidev provides these at runtime
+import { onSlideEnter, onSlideLeave } from '@slidev/client'
 
 const props = defineProps<{
   variant?: 'dark' | 'light'
@@ -7,10 +9,12 @@ const props = defineProps<{
 
 const variant = props.variant ?? 'dark'
 const canvasEl = ref<HTMLCanvasElement | null>(null)
+
 let rafId: number | null = null
 let removeMouseListener: (() => void) | null = null
 let removeResizeListener: (() => void) | null = null
-let resizeObserver: ResizeObserver | null = null
+let glInitialized = false
+let drawFn: ((t: number) => void) | null = null
 
 const VS = `attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`
 
@@ -82,13 +86,13 @@ void main(){
 
 const mouse = { x: 0.5, y: 0.5 }
 
-onMounted(() => {
+function initGL() {
   const canvas = canvasEl.value
-  if (!canvas) return
-
+  if (!canvas || glInitialized) return
   const fsSrc = variant === 'light' ? FS_LIGHT : FS_DARK
   const gl = canvas.getContext('webgl', { alpha: false, antialias: true })
   if (!gl) return
+  glInitialized = true
 
   const mk = (t: number, s: string) => {
     const sh = gl.createShader(t)!
@@ -118,6 +122,9 @@ onMounted(() => {
     const h = Math.max(rect.height, 1)
     const nextW = Math.round(w * dpr)
     const nextH = Math.round(h * dpr)
+    // Critical: setting canvas.width/height clears the WebGL drawing buffer.
+    // Skipping the assignment when the size is unchanged is what lets the
+    // per-frame call here remain cheap and correct.
     if (canvas.width !== nextW || canvas.height !== nextH) {
       canvas.width = nextW
       canvas.height = nextH
@@ -126,13 +133,6 @@ onMounted(() => {
   }
   window.addEventListener('resize', resize)
   removeResizeListener = () => window.removeEventListener('resize', resize)
-  // ResizeObserver catches the case where the canvas is mounted at 0x0 (because
-  // its slide is hidden) and only gets dimensions once the user navigates to it.
-  // Without this, navigating to a hero slide for the first time after page load
-  // shows no animation until a manual refresh.
-  resizeObserver = new ResizeObserver(resize)
-  resizeObserver.observe(canvas)
-  resize()
 
   const onMouseMove = (e: MouseEvent) => {
     mouse.x = e.clientX / window.innerWidth
@@ -141,24 +141,48 @@ onMounted(() => {
   window.addEventListener('mousemove', onMouseMove)
   removeMouseListener = () => window.removeEventListener('mousemove', onMouseMove)
 
-  const t0 = Date.now()
-  const loop = () => {
-    const t = (Date.now() - t0) / 1000
+  drawFn = (t: number) => {
+    resize()
     gl.uniform2f(lRes, canvas.width, canvas.height)
     gl.uniform1f(lT, t)
     gl.uniform2f(lM, mouse.x, 1 - mouse.y)
     gl.drawArrays(gl.TRIANGLES, 0, 6)
+  }
+}
+
+const t0 = Date.now()
+
+function startLoop() {
+  if (rafId !== null) return
+  initGL()
+  if (!drawFn) return
+  const loop = () => {
+    const t = (Date.now() - t0) / 1000
+    drawFn!(t)
     rafId = requestAnimationFrame(loop)
   }
-  loop()
+  rafId = requestAnimationFrame(loop)
+}
+
+function stopLoop() {
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId)
+    rafId = null
+  }
+}
+
+onSlideEnter(() => {
+  startLoop()
+})
+
+onSlideLeave(() => {
+  stopLoop()
 })
 
 onUnmounted(() => {
-  if (rafId !== null) cancelAnimationFrame(rafId)
+  stopLoop()
   removeMouseListener?.()
   removeResizeListener?.()
-  resizeObserver?.disconnect()
-  resizeObserver = null
 })
 </script>
 
@@ -174,7 +198,7 @@ onUnmounted(() => {
   height: 100%;
   display: block;
   pointer-events: none;
-  /* No explicit z-index. The canvas paints in DOM order; the chrome / frame /
-     foot siblings come after in the slide-shell so they always render on top. */
+  /* No explicit z-index. The chrome / frame / foot siblings sit above via
+     position:relative + z-index:1 set in slides/styles/index.css. */
 }
 </style>
