@@ -34,23 +34,25 @@ htmlAttrs:
 
 <div class="slide-shell">
   <WebGLBackground variant="dark" />
-  <div class="chrome"><div>Field Report &middot; AI Apps</div><div>01 / 16</div></div>
+  <div class="chrome"><div>Expert Talks &middot; Dani Akash</div><div>01 / 16</div></div>
   <div class="frame" style="display:grid;grid-template-columns:1.05fr .95fr;gap:5vw;align-items:center;height:100%">
     <div>
       <div class="kicker">REACT + POSTGRES</div>
       <h1 class="h-hero h-hero-en" style="font-size:5.4vw">The AI-ready stack<br/><span class="accent">you already know.</span></h1>
-      <p class="lead" style="max-width:52vw;margin-top:3vh">A 45-minute field guide to building AI-heavy web apps with fewer services, less glue, and a lot less YAML.</p>
+      <p class="lead" style="max-width:52vw;margin-top:3vh">How building an AI-ready app is much simpler than you'd expect.</p>
       <div class="meta-row" style="margin-top:3vh"><span>PostgreSQL</span><span>React Server Components</span><span>AI Agents</span></div>
     </div>
     <div class="terminal" aria-label="terminal install command">
-      <span class="line"><span class="prompt">$</span> createdb ai_ready_app</span>
-      <span class="line"><span class="prompt">$</span> psql -c "create extension vector;"</span>
-      <span class="line"><span class="prompt">$</span> npm run dev</span>
+      <span class="line"><span class="prompt">$</span> docker run -d --name pg \</span>
+      <span class="line">    -p 5432:5432 \</span>
+      <span class="line">    -e POSTGRES_PASSWORD=secret \</span>
+      <span class="line">    postgres:16</span>
+      <span class="line"><span class="prompt">$</span> bun run dev</span>
       <span class="line dim" style="margin-top:2vh">auth / search / vectors / jobs / realtime</span>
       <span class="line"><span class="prompt">postgres</span> is already in the room.</span>
     </div>
   </div>
-  <div class="foot"><div class="title">React + Postgres &middot; AI-ready stack</div><div>FIELD REPORT</div></div>
+  <div class="foot"><div class="title">React + Postgres &middot; AI-ready stack</div><div>OPENING</div></div>
 </div>
 
 <!-- ============================================================ -->
