@@ -199,19 +199,35 @@ class: 'dark'
         <span class="callout-src">shared process &middot; shared restart</span>
       </div>
     </div>
-    <div class="diagram">
-      <div class="node">
-        <div class="label">One node process &middot; one restart</div>
-        <div class="name" style="margin-bottom:1.4vh">The app</div>
-        <div class="workload-stack">
-          <div class="workload"><span class="workload-name">HTTP requests</span><span class="workload-tag">short</span></div>
-          <div class="workload"><span class="workload-name">SQL queries</span><span class="workload-tag">short</span></div>
-          <div class="workload"><span class="workload-name">Auth checks</span><span class="workload-tag">short</span></div>
-          <div class="workload"><span class="workload-name">REST handlers</span><span class="workload-tag">short</span></div>
-          <div class="workload stress"><span class="workload-name">Embedding jobs</span><span class="workload-tag">slow</span></div>
-          <div class="workload stress"><span class="workload-name">WebSocket streams</span><span class="workload-tag">open</span></div>
-          <div class="workload stress"><span class="workload-name">Background workers</span><span class="workload-tag">queued</span></div>
-          <div class="workload stress"><span class="workload-name">Vector retrieval</span><span class="workload-tag">heavy</span></div>
+    <div class="diagram" style="position:relative">
+      <div v-click.hide="1">
+        <div class="node">
+          <div class="label">One node process &middot; one restart</div>
+          <div class="name" style="margin-bottom:1.4vh">The app</div>
+          <div class="workload-stack">
+            <div class="workload"><span class="workload-name">HTTP requests</span><span class="workload-tag">short</span></div>
+            <div class="workload"><span class="workload-name">SQL queries</span><span class="workload-tag">short</span></div>
+            <div class="workload"><span class="workload-name">Auth checks</span><span class="workload-tag">short</span></div>
+            <div class="workload"><span class="workload-name">REST handlers</span><span class="workload-tag">short</span></div>
+            <div class="workload stress"><span class="workload-name">Embedding jobs</span><span class="workload-tag">slow</span></div>
+            <div class="workload stress"><span class="workload-name">WebSocket streams</span><span class="workload-tag">open</span></div>
+            <div class="workload stress"><span class="workload-name">Background workers</span><span class="workload-tag">queued</span></div>
+            <div class="workload stress"><span class="workload-name">Vector retrieval</span><span class="workload-tag">heavy</span></div>
+          </div>
+        </div>
+      </div>
+      <div v-click="1" style="position:absolute;inset:0">
+        <div class="terminal" aria-label="monolith stress trace">
+          <span class="line"><span class="prompt">$</span> pm2 status</span>
+          <span class="line dim">  app &nbsp;&middot;&nbsp; uptime 4h &nbsp;&middot;&nbsp; mem 1.8g &nbsp;&middot;&nbsp; 1 process</span>
+          <span class="line" style="margin-top:1.4vh"><span class="prompt">$</span> tail -f app.log</span>
+          <span class="line dim">12:04:01 &nbsp;api &nbsp;POST /search &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;200 &nbsp;12ms</span>
+          <span class="line dim">12:04:02 &nbsp;api &nbsp;POST /search &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;200 &nbsp;14ms</span>
+          <span class="line warn">12:04:03 &nbsp;job &nbsp;embed_documents &nbsp;running (4.2s)</span>
+          <span class="line warn">12:04:04 &nbsp;api &nbsp;POST /chat &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;queued &middot; 8 ahead</span>
+          <span class="line bad">12:04:05 &nbsp;ws &nbsp;&nbsp;stream/12 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;disconnect (no thread)</span>
+          <span class="line bad">12:04:06 &nbsp;job &nbsp;ingest_batch &nbsp;&nbsp;&nbsp;&nbsp;OOM &middot; process restarting</span>
+          <span class="line bad">12:04:06 &nbsp;api &nbsp;POST /search &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;503 &middot; process restarting</span>
         </div>
       </div>
     </div>
