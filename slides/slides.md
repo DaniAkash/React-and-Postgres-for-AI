@@ -33,6 +33,7 @@ htmlAttrs:
 </style>
 
 <div class="slide-shell">
+  <WebGLBackground variant="dark" />
   <div class="chrome"><div>Field Report &middot; AI Apps</div><div>01 / 16</div></div>
   <div class="frame" style="display:grid;grid-template-columns:1.05fr .95fr;gap:5vw;align-items:center;height:100%">
     <div>
@@ -133,6 +134,7 @@ class: 'hero light'
 ---
 
 <div class="slide-shell">
+  <WebGLBackground variant="light" />
   <div class="chrome"><div>Turn &middot; Platform</div><div>05 / 16</div></div>
   <div class="frame" style="display:grid;gap:4vh;align-content:center;height:100%">
     <div class="kicker">THE TURN</div>
@@ -314,6 +316,7 @@ class: 'hero dark'
 ---
 
 <div class="slide-shell">
+  <WebGLBackground variant="dark" />
   <div class="chrome"><div>React &middot; Server Components</div><div>13 / 16</div></div>
   <div class="frame" style="display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:center;height:100%">
     <div>
@@ -377,6 +380,7 @@ class: 'hero light'
 ---
 
 <div class="slide-shell">
+  <WebGLBackground variant="light" />
   <div class="chrome"><div>Close &middot; Takeaway</div><div>16 / 16</div></div>
   <div class="frame" style="display:grid;gap:5vh;align-content:center;height:100%">
     <div class="kicker">THE RULE OF THUMB</div>

@@ -33,6 +33,8 @@
    theme colors in Slidev. Make them transparent so the WebGL canvases
    mounted by global-bottom.vue bleed through. The .slide-shell::before
    overlay still paints the wash needed for legibility. */
+/* Anchor a base ink fallback so the slide is never visibly empty before the
+   per-slide <WebGLBackground /> canvas has mounted. */
 html, body { background: var(--ink); }
 .slidev-slide-container,
 .slidev-slide-content,
@@ -70,6 +72,15 @@ html, body { background: var(--ink); }
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  z-index: 1;
+}
+/* Promote the slide content siblings to a positioned stacking context so they
+   sit above the <WebGLBackground> canvas (which is position:absolute and would
+   otherwise outrank non-positioned siblings inside the slide-shell). */
+.slide-shell > .chrome,
+.slide-shell > .frame,
+.slide-shell > .foot {
+  position: relative;
   z-index: 1;
 }
 .slide-shell::before {
@@ -829,21 +840,9 @@ em { font-style: italic; font-family: var(--serif-en); }
 .ico-md { width: 1.8vw; height: 1.8vw; stroke-width: 1.3; display: inline-block; vertical-align: -0.4em; }
 .ico-sm { width: 1.1vw; height: 1.1vw; stroke-width: 1.4; display: inline-block; vertical-align: -0.15em; opacity: 0.7; }
 
-/* ============ WebGL canvases (mounted by global-bottom.vue) ============ */
-canvas.bg {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-  display: block;
-  transition: opacity 1.2s ease;
-  pointer-events: none;
-}
-canvas#bg-light { opacity: 0; }
-canvas#bg-dark  { opacity: 1; }
-body.light-bg canvas#bg-light { opacity: 1; }
-body.light-bg canvas#bg-dark  { opacity: 0; }
+/* WebGL canvases are styled in global-bottom.vue, which teleports them to
+   <body> so they escape Slidev's transformed slide-container and can occupy
+   the true viewport. */
 
 /* ============ Responsive fallback ============ */
 @media (max-width: 900px) {
