@@ -653,6 +653,46 @@ em { font-style: italic; font-family: var(--serif-en); }
   opacity: 0.6;
 }
 
+/* ============ Workload list (slide 5 monolith visual) ============ */
+.workload-stack {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.4vh;
+}
+.workload {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.95vh 0;
+  border-bottom: 1px dashed rgba(127, 127, 127, 0.22);
+  font-family: var(--sans-body);
+  font-size: max(13px, 1vw);
+}
+.workload:last-child { border-bottom: 0; }
+.workload-name { color: var(--volt-warm); }
+.workload-tag {
+  font-family: var(--mono);
+  font-size: 0.72em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.workload.stress {
+  background: rgba(0, 217, 146, 0.06);
+  border-left: 2px solid var(--volt-green);
+  margin: 0 -0.7vw;
+  padding-left: 0.6vw;
+  padding-right: 0.7vw;
+}
+.workload.stress .workload-name {
+  color: var(--volt-white);
+  font-weight: 600;
+}
+.workload.stress .workload-tag {
+  color: var(--volt-green);
+  opacity: 0.95;
+}
+
 /* ============ Capability card (slides 3 + 4) ============ */
 .cap-card {
   display: flex;

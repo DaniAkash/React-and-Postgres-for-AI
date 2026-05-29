@@ -190,21 +190,33 @@ class: 'dark'
 <div class="slide-shell">
   <div class="chrome"><div>Architecture &middot; Baseline</div><ChromeCounter /></div>
   <div class="frame grid-2-6-6" style="padding-top:6vh">
-    <div class="col" style="justify-content:space-between;min-height:66vh">
-      <div>
-        <div class="kicker">OPTION 01</div>
-        <h2 class="h-xl" style="font-size:4.4vw">The traditional monolith is simple until AI makes it hungry.</h2>
-        <p class="lead" style="margin-top:2vh">One deployable unit. One database. Great local reasoning. Then embeddings, async ingestion, chat updates, and permissioned retrieval push pressure into every corner.</p>
+    <div class="col">
+      <div class="kicker">OPTION 01</div>
+      <h2 class="h-xl" style="font-size:3.6vw">One deployment. Eight workloads. One restart.</h2>
+      <p class="lead" style="margin-top:2.4vh">A monolith treats every workload like a short HTTP request. AI brings shapes that do not fit.</p>
+      <div class="callout" style="margin-top:4vh">
+        <div class="q-big">When embeddings, streams, and background jobs share threads with your web layer, the failure modes couple.</div>
+        <span class="callout-src">shared process &middot; shared restart</span>
       </div>
-      <div class="callout"><div class="q-big">The monolith is not wrong. It is just asked to pretend every workload is a request-response workload.</div><span class="callout-src">runtime pressure &middot; async / vector / realtime</span></div>
     </div>
     <div class="diagram">
-      <div class="node hot"><div class="label">Web App</div><div class="name">React UI + API routes</div><div class="desc">Business logic, auth checks, data access, AI calls.</div></div>
-      <div class="node"><div class="label">Database</div><div class="name">Postgres as system of record</div><div class="desc">Application tables, relational constraints, transactions.</div></div>
-      <div class="node"><div class="label">New Pressure</div><div class="name">Embedding jobs, retrieval, live status</div><div class="desc">Usually bolted on after the first AI feature works.</div></div>
+      <div class="node">
+        <div class="label">One node process &middot; one restart</div>
+        <div class="name" style="margin-bottom:1.4vh">The app</div>
+        <div class="workload-stack">
+          <div class="workload"><span class="workload-name">HTTP requests</span><span class="workload-tag">short</span></div>
+          <div class="workload"><span class="workload-name">SQL queries</span><span class="workload-tag">short</span></div>
+          <div class="workload"><span class="workload-name">Auth checks</span><span class="workload-tag">short</span></div>
+          <div class="workload"><span class="workload-name">REST handlers</span><span class="workload-tag">short</span></div>
+          <div class="workload stress"><span class="workload-name">Embedding jobs</span><span class="workload-tag">slow</span></div>
+          <div class="workload stress"><span class="workload-name">WebSocket streams</span><span class="workload-tag">open</span></div>
+          <div class="workload stress"><span class="workload-name">Background workers</span><span class="workload-tag">queued</span></div>
+          <div class="workload stress"><span class="workload-name">Vector retrieval</span><span class="workload-tag">heavy</span></div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="foot"><div class="title">One process, one database, new workload shapes</div><div>OPTION 01</div></div>
+  <div class="foot"><div class="title">Where the failure modes couple</div><div>OPTION 01</div></div>
 </div>
 
 ---
