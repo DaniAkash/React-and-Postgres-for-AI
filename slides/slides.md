@@ -119,21 +119,68 @@ class: 'light'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Problem &middot; Service Sprawl</div><ChromeCounter /></div>
+  <div class="chrome"><div>AI-Ready &middot; Foundation</div><ChromeCounter /></div>
   <div class="frame" style="padding-top:5vh">
-    <div class="kicker">THE JUNK DRAWER ARCHITECTURE</div>
-    <h2 class="h-xl" style="font-size:4.4vw">AI features tend to arrive with a small country of infrastructure.</h2>
-    <p class="lead" style="max-width:66vw;margin-top:2.4vh">A queue here, a vector database there, a realtime layer, a search engine, a separate auth service. The feature ships, but the operational surface area keeps compounding.</p>
-    <div class="grid-6" style="margin-top:6vh">
-      <div class="stat-card"><div class="stat-label">Auth</div><div class="stat-nb">1<span class="stat-unit"> service</span></div><div class="stat-note">Identity, roles, policies, sync.</div></div>
-      <div class="stat-card"><div class="stat-label">Vectors</div><div class="stat-nb">1<span class="stat-unit"> db</span></div><div class="stat-note">Embeddings, metadata joins, filters.</div></div>
-      <div class="stat-card"><div class="stat-label">Search</div><div class="stat-nb">1<span class="stat-unit"> engine</span></div><div class="stat-note">Indexing pipeline and relevance tuning.</div></div>
-      <div class="stat-card"><div class="stat-label">Realtime</div><div class="stat-nb">1<span class="stat-unit"> bus</span></div><div class="stat-note">Events, fanout, subscriptions.</div></div>
-      <div class="stat-card"><div class="stat-label">Jobs</div><div class="stat-nb">1<span class="stat-unit"> queue</span></div><div class="stat-note">Retries, locks, backoff, workers.</div></div>
-      <div class="stat-card"><div class="stat-label">APIs</div><div class="stat-nb">N<span class="stat-unit"> endpoints</span></div><div class="stat-note">Glue code for every new shape.</div></div>
+    <div class="kicker">THE PARTS LIST</div>
+    <h2 class="h-xl" style="font-size:5vw">How to make an app AI-ready?</h2>
+    <div class="grid-4" style="margin-top:5vh">
+      <div class="cap-card">
+        <div class="cap-header"><div class="cap-emoji">&#128272;</div><div class="cap-name">Authentication</div></div>
+        <div class="cap-row cap-why"><span class="cap-label">Why</span>Agents act on behalf of a real user; the data layer needs to know which user and what they may touch.</div>
+        <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>A personal AI assistant that reads YOUR inbox, not someone else's.</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-header"><div class="cap-emoji">&#128268;</div><div class="cap-name">REST / GraphQL APIs</div></div>
+        <div class="cap-row cap-why"><span class="cap-label">Why</span>Both the UI and the agent need typed, discoverable endpoints to call.</div>
+        <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>An agent tool surface the LLM can introspect and invoke without hand-written glue.</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-header"><div class="cap-emoji">&#128450;&#65039;</div><div class="cap-name">Structured data</div></div>
+        <div class="cap-row cap-why"><span class="cap-label">Why</span>Filtering, joining, and aggregating real business rows is what most useful AI actually does.</div>
+        <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>"Chat with your invoices": the agent runs filtered queries over real customer records.</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-header"><div class="cap-emoji">&#128196;</div><div class="cap-name">Unstructured data</div></div>
+        <div class="cap-row cap-why"><span class="cap-label">Why</span>Agent state, tool calls, citations, and intermediate reasoning don't fit neat columns.</div>
+        <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>Save and replay a full agent run, including every tool call and message.</div>
+      </div>
     </div>
   </div>
-  <div class="foot"><div class="title">The feature is not the problem &middot; the glue is</div><div>COMPLEXITY MAP</div></div>
+  <div class="foot"><div class="title">Eight capabilities every AI-ready app needs</div><div>FOUNDATION</div></div>
+</div>
+
+---
+class: 'light'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>AI-Ready &middot; Runtime</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">&hellip;continued</div>
+    <div class="grid-4" style="margin-top:3vh">
+      <div class="cap-card">
+        <div class="cap-header"><div class="cap-emoji">&#9203;</div><div class="cap-name">Queues</div></div>
+        <div class="cap-row cap-why"><span class="cap-label">Why</span>Embedding, summarisation, and ingestion take seconds to minutes; the UI cannot wait.</div>
+        <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>Background indexing of new docs into RAG without blocking chat.</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-header"><div class="cap-emoji">&#128269;</div><div class="cap-name">Search</div></div>
+        <div class="cap-row cap-why"><span class="cap-label">Why</span>Vector finds "things like this"; full-text finds exact names and IDs; both must respect tenant + permissions.</div>
+        <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>Hybrid retrieval across support tickets. Meaning AND product-name matches, filtered by org.</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-header"><div class="cap-emoji">&#129521;</div><div class="cap-name">Type-safety</div></div>
+        <div class="cap-row cap-why"><span class="cap-label">Why</span>One schema change should not silently break four downstream services; agents need stable contracts too.</div>
+        <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>MCP tool schemas derived from the DB schema. Never out of sync with the data.</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-header"><div class="cap-emoji">&#128225;</div><div class="cap-name">Realtime updates</div></div>
+        <div class="cap-row cap-why"><span class="cap-label">Why</span>Agents stream tokens; jobs change state; UIs need to react without polling.</div>
+        <div class="cap-row cap-unlocks"><span class="cap-label">Unlocks</span>Live "thinking &rarr; calling tool &rarr; drafting" status as the agent works.</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div class="title">&hellip;same eight, continued</div><div>RUNTIME</div></div>
 </div>
 
 ---

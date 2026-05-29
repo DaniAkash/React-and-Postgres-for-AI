@@ -653,6 +653,47 @@ em { font-style: italic; font-family: var(--serif-en); }
   opacity: 0.6;
 }
 
+/* ============ Capability card (slides 3 + 4) ============ */
+.cap-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vh;
+  padding-top: 1.6vh;
+  border-top: 1px solid currentColor;
+  border-color: rgba(127, 127, 127, 0.32);
+}
+.cap-card .cap-header {
+  display: flex;
+  gap: 0.7vw;
+  align-items: baseline;
+}
+.cap-card .cap-emoji {
+  font-size: 1.7vw;
+  line-height: 1;
+}
+.cap-card .cap-name {
+  font-family: var(--serif-en);
+  font-weight: 700;
+  font-size: 1.85vw;
+  line-height: 1.15;
+}
+.cap-card .cap-row {
+  font-family: var(--sans-body);
+  font-size: max(13px, 0.92vw);
+  line-height: 1.5;
+  opacity: 0.78;
+  margin-top: 0.6vh;
+}
+.cap-card .cap-row.cap-unlocks { opacity: 0.92; }
+.cap-card .cap-label {
+  font-family: var(--mono);
+  font-size: 0.7em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-right: 0.55em;
+}
+
 /* ============ Pillar ============ */
 .pillar { display: flex; flex-direction: column; gap: 1.8vh; }
 .pillar .ic {
