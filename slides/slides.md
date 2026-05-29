@@ -275,7 +275,6 @@ class: 'hero light'
   <WebGLBackground variant="light" />
   <div class="chrome"><div>Turn &middot; Platform</div><ChromeCounter /></div>
   <div class="frame" style="display:grid;gap:4vh;align-content:center;height:100%">
-    <div class="kicker">THE TURN</div>
     <h1 class="h-hero" style="font-size:6.8vw">Postgres stopped being just a database.</h1>
     <p class="lead" style="max-width:58vw">It became a programmable platform: transactional, permissioned, extensible, searchable, observable enough, and already sitting on your critical path.</p>
     <div class="chipline"><span class="chip">RLS</span><span class="chip">pgvector</span><span class="chip">LISTEN / NOTIFY</span><span class="chip">full-text search</span><span class="chip">jobs</span><span class="chip">generated APIs</span></div>
