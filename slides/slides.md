@@ -245,16 +245,16 @@ class: 'light'
 
 <div class="slide-shell">
   <div class="chrome"><div>Architecture &middot; Sprawl</div><ChromeCounter /></div>
-  <div class="frame" style="padding-top:5vh">
+  <div class="frame" style="padding-top:3vh">
     <div class="kicker">OPTION 02</div>
-    <h2 class="h-xl" style="font-size:5.2vw">Microservices solve the pressure by distributing the pain.</h2>
-    <p class="lead" style="max-width:72vw;margin-top:2vh">Specialized tools can be the right answer at scale. But for a small team, every extra service adds a contract, a failure mode, a bill, and a page in the runbook.</p>
-    <div class="compare">
+    <h2 class="h-xl" style="font-size:4vw">Microservices solve the pressure by distributing the pain.</h2>
+    <p class="lead" style="max-width:72vw;margin-top:1.4vh">Specialized tools can be the right answer at scale. But for a small team, every extra service adds a contract, a failure mode, a bill, and a page in the runbook.</p>
+    <div class="compare" style="margin-top:2vh">
       <div class="colbox"><h3>Auth service</h3><p>Application roles become claims, sync jobs, middleware checks, and policy drift.</p></div>
       <div class="colbox"><h3>Vector database</h3><p>Embeddings leave the relational context that usually decides whether a row is even visible.</p></div>
       <div class="colbox"><h3>Queue + realtime</h3><p>Every job state now has to travel through another system before the UI can trust it.</p></div>
     </div>
-    <div class="terminal" style="margin-top:5vh">
+    <div class="terminal" style="margin-top:2vh;padding:1.4vh 1.6vw">
       <span class="line dim">infra/</span>
       <span class="line">  docker-compose.yml</span>
       <span class="line">  vector-db.yml</span>
