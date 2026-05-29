@@ -756,6 +756,22 @@ em { font-style: italic; font-family: var(--serif-en); }
   opacity: 0.76;
   line-height: 1.6;
 }
+.pillar .d-example {
+  font-family: var(--sans-body);
+  font-style: italic;
+  font-size: max(12px, 0.92vw);
+  line-height: 1.5;
+  opacity: 0.6;
+}
+.pillar .d-example-label {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 0.78em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-right: 0.6em;
+}
 
 /* ============ Plat / Row ============ */
 .plat {

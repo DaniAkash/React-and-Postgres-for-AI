@@ -287,23 +287,40 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Stack &middot; Map</div><ChromeCounter /></div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">OPTION 03</div>
-    <h2 class="h-xl" style="font-size:4.2vw">The Postgres + React Server Components approach collapses layers.</h2>
-    <div class="pipeline-section">
-      <div class="pipeline-label">Request path</div>
-      <div class="pipeline" data-cols="5">
-        <div class="step"><div class="step-nb">01</div><div class="step-title">User intent</div><div class="step-desc">A prompt, search, workflow run, or dashboard view.</div></div>
-        <div class="step"><div class="step-nb">02</div><div class="step-title">RSC boundary</div><div class="step-desc">Server components fetch without shipping a client data layer.</div></div>
-        <div class="step"><div class="step-nb">03</div><div class="step-title">Postgres policies</div><div class="step-desc">RLS decides visibility next to the data.</div></div>
-        <div class="step"><div class="step-nb">04</div><div class="step-title">AI retrieval</div><div class="step-desc">Hybrid full-text + vector queries with relational filters.</div></div>
-        <div class="step"><div class="step-nb">05</div><div class="step-title">Stream UI</div><div class="step-desc">RSC renders the result path back into the app.</div></div>
+  <div class="chrome"><div>Platform &middot; Why</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:3.5vh">
+    <h2 class="h-xl" style="font-size:3.4vw">Three decisions turned the database into a platform.</h2>
+    <p class="lead" style="max-width:78vw;margin-top:1.4vh">Object-relational core, one transaction system, one log. Every AI-ready capability either ships in the box or plugs into the same three primitives.</p>
+    <div class="grid-3" style="margin-top:4vh">
+      <div class="pillar" v-click>
+        <div class="ic">01</div>
+        <div class="t">Catalog-driven</div>
+        <div class="d">Types, operators, indexes, and functions are themselves data. Adding capability is declaring it.</div>
+        <div class="d-example"><span class="d-example-label">e.g.</span>pgvector adds two new index types (HNSW, IVF), as first-class as B-tree.</div>
+      </div>
+      <div class="pillar" v-click>
+        <div class="ic">02</div>
+        <div class="t">One transaction system</div>
+        <div class="d">Writes, schema changes, NOTIFY, and job enqueue all share the same atomic boundary.</div>
+        <div class="d-example"><span class="d-example-label">e.g.</span>"Insert the row, audit it, enqueue the embedding, notify the UI" is one statement.</div>
+      </div>
+      <div class="pillar" v-click>
+        <div class="ic">03</div>
+        <div class="t">WAL as a universal log</div>
+        <div class="d">One log powers crash recovery, PITR, streaming replication, logical CDC, and read replicas.</div>
+        <div class="d-example"><span class="d-example-label">e.g.</span>Every downstream pattern (audit, replicas, CDC, ETL) reuses the same primitive.</div>
       </div>
     </div>
-    <div class="terminal" style="margin-top:5vh"><span class="line"><span class="prompt">app/agent/page.tsx</span> imports server-only data functions</span><span class="line dim">No browser secret. No client cache ceremony. No duplicated permission model.</span></div>
+    <div class="chipline" v-click style="margin-top:3.4vh;justify-content:center">
+      <span class="chip">pgvector</span>
+      <span class="chip">PostgREST</span>
+      <span class="chip">pg_graphql</span>
+      <span class="chip">graphile_worker</span>
+      <span class="chip">pg_cron</span>
+      <span class="chip">Supabase Realtime</span>
+    </div>
   </div>
-  <div class="foot"><div class="title">One data plane &middot; server-rendered product surface</div><div>OPTION 03</div></div>
+  <div class="foot"><div class="title">Earned, not declared.</div><div>WHY POSTGRES</div></div>
 </div>
 
 ---
