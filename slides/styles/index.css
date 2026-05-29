@@ -29,8 +29,17 @@
 }
 
 /* ============ Slidev page chrome ============ */
+/* The layout, slide container, and slide content all default to opaque
+   theme colors in Slidev. Make them transparent so the WebGL canvases
+   mounted by global-bottom.vue bleed through. The .slide-shell::before
+   overlay still paints the wash needed for legibility. */
+html, body { background: var(--ink); }
+.slidev-slide-container,
+.slidev-slide-content,
 .slidev-layout {
-  background: var(--ink);
+  background: transparent !important;
+}
+.slidev-layout {
   color: var(--paper);
   font-family: var(--sans-body);
   -webkit-font-smoothing: antialiased;
