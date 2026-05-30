@@ -416,36 +416,11 @@ class: 'light'
 
 <div class="slide-shell">
   <div class="chrome"><div>Detour &middot; Supabase</div><ChromeCounter /></div>
-  <div class="frame grid-2-6-6" style="padding-top:5vh">
-    <div>
-      <div class="kicker">QUICK SHOW OF HANDS</div>
-      <h2 class="h-xl" style="font-size:4.4vw">Has anyone here tried <span class="accent">Supabase</span>?</h2>
-      <p class="lead" style="margin-top:1.6vh">Probably most of you. It became a verb. Worth one minute to map why they made the same Postgres-as-platform bet we are about to make.</p>
-      <div class="meta-row" style="margin-top:2.2vh"><span>supabase.com</span></div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:2.2vh">
-      <div class="cap-card" v-click>
-        <div class="cap-header">
-          <div class="cap-emoji">&#10067;</div>
-          <div class="cap-name">What's the best part?</div>
-        </div>
-        <div class="cap-row cap-unlocks"><span class="cap-label">Audience</span>(your answer here)</div>
-      </div>
-      <div class="cap-card" v-click>
-        <div class="cap-header">
-          <div class="cap-emoji">&#128274;</div>
-          <div class="cap-name">RLS, baked in.</div>
-        </div>
-        <div class="cap-row cap-unlocks"><span class="cap-label">Auth</span>The exact pattern we just walked through, behind a JWT.</div>
-      </div>
-      <div class="cap-card" v-click>
-        <div class="cap-header">
-          <div class="cap-emoji">&#128194;</div>
-          <div class="cap-name">The database, as an easy interface.</div>
-        </div>
-        <div class="cap-row cap-unlocks"><span class="cap-label">DX</span>REST, GraphQL, realtime, all derived from your schema.</div>
-      </div>
-    </div>
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker">QUICK SHOW OF HANDS</div>
+    <h2 class="h-xl" style="font-size:5.6vw;max-width:80vw">Has anyone here tried <span class="accent">Supabase</span>?</h2>
+    <p class="lead" style="margin-top:2vh;max-width:64vw">Probably most of you. It became a verb. Worth one minute to map why they made the same Postgres-as-platform bet we are about to make.</p>
+    <div class="meta-row" style="margin-top:3vh"><span>supabase.com</span></div>
   </div>
   <div class="foot"><div class="title">Why Supabase works: the database does the heavy lifting.</div><div>DETOUR</div></div>
 </div>
@@ -464,28 +439,30 @@ class: 'dark'
       <div class="callout" style="margin-top:3vh"><div class="q-big">Auto-generated. Open source. Same Postgres, same policies, two protocols.</div><span class="callout-src">PostgREST &middot; PostGraphile</span></div>
     </div>
     <div style="display:flex;flex-direction:column;gap:2.4vh">
-      <div>
-        <div class="kicker" style="margin-bottom:0.8vh">REST</div>
-        <div style="font-family:var(--serif-en);font-weight:700;font-size:1.7vw;line-height:1.15">PostgREST</div>
-        <div style="font-family:var(--sans-body);font-size:max(13px,0.95vw);opacity:0.72;line-height:1.45;margin-top:0.4vh">postgrest.org</div>
-        <div class="terminal" style="margin-top:1.2vh;padding:1.4vh 1.1vw">
-          <span class="line"><span class="prompt">$</span> PGRST_DB_URI="postgres://..." \</span>
-          <span class="line">&nbsp;&nbsp;PGRST_DB_ANON_ROLE=anon \</span>
-          <span class="line">&nbsp;&nbsp;postgrest</span>
-          <span class="line dim" style="margin-top:0.6vh">&rarr; http://localhost:3000</span>
+      <v-clicks>
+        <div>
+          <div class="kicker" style="margin-bottom:0.8vh">REST</div>
+          <div style="font-family:var(--serif-en);font-weight:700;font-size:1.7vw;line-height:1.15">PostgREST</div>
+          <div style="font-family:var(--sans-body);font-size:max(13px,0.95vw);opacity:0.72;line-height:1.45;margin-top:0.4vh">postgrest.org</div>
+          <div class="terminal" style="margin-top:1.2vh;padding:1.4vh 1.1vw">
+            <span class="line"><span class="prompt">$</span> PGRST_DB_URI="postgres://..." \</span>
+            <span class="line">&nbsp;&nbsp;PGRST_DB_ANON_ROLE=anon \</span>
+            <span class="line">&nbsp;&nbsp;postgrest</span>
+            <span class="line dim" style="margin-top:0.6vh">&rarr; http://localhost:3000</span>
+          </div>
         </div>
-      </div>
-      <div>
-        <div class="kicker" style="margin-bottom:0.8vh">GRAPHQL</div>
-        <div style="font-family:var(--serif-en);font-weight:700;font-size:1.7vw;line-height:1.15">PostGraphile</div>
-        <div style="font-family:var(--sans-body);font-size:max(13px,0.95vw);opacity:0.72;line-height:1.45;margin-top:0.4vh">postgraphile.org</div>
-        <div class="terminal" style="margin-top:1.2vh;padding:1.4vh 1.1vw">
-          <span class="line"><span class="prompt">$</span> npx postgraphile \</span>
-          <span class="line">&nbsp;&nbsp;-P postgraphile/presets/amber \</span>
-          <span class="line">&nbsp;&nbsp;-c "postgres://..." -e</span>
-          <span class="line dim" style="margin-top:0.6vh">&rarr; http://localhost:5678/graphql</span>
+        <div>
+          <div class="kicker" style="margin-bottom:0.8vh">GRAPHQL</div>
+          <div style="font-family:var(--serif-en);font-weight:700;font-size:1.7vw;line-height:1.15">PostGraphile</div>
+          <div style="font-family:var(--sans-body);font-size:max(13px,0.95vw);opacity:0.72;line-height:1.45;margin-top:0.4vh">postgraphile.org</div>
+          <div class="terminal" style="margin-top:1.2vh;padding:1.4vh 1.1vw">
+            <span class="line"><span class="prompt">$</span> npx postgraphile \</span>
+            <span class="line">&nbsp;&nbsp;-P postgraphile/presets/amber \</span>
+            <span class="line">&nbsp;&nbsp;-c "postgres://..." -e</span>
+            <span class="line dim" style="margin-top:0.6vh">&rarr; http://localhost:5678/graphql</span>
+          </div>
         </div>
-      </div>
+      </v-clicks>
     </div>
   </div>
   <div class="foot"><div class="title">One binary each. Same schema. Two protocols.</div><div>REST + GRAPHQL</div></div>
