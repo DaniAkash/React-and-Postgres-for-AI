@@ -853,22 +853,48 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; Realtime</div><ChromeCounter /></div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">REALTIME DIRECTLY IN THE DB</div>
-    <h2 class="h-xl" style="font-size:4.6vw">For many agent workflows, live updates are database events.</h2>
-    <p class="lead" style="max-width:72vw;margin-top:2vh">LISTEN/NOTIFY is not a replacement for every event system. But for "job advanced", "run failed", "message ready", and "document indexed", it can be the simplest honest event source.</p>
-    <div class="pipeline-section">
-      <div class="pipeline-label">Agent run lifecycle</div>
-      <div class="pipeline" data-cols="4">
-        <div class="step"><div class="step-nb">01</div><div class="step-title">Insert run</div><div class="step-desc">UI creates a row with status queued.</div></div>
-        <div class="step"><div class="step-nb">02</div><div class="step-title">Worker claims</div><div class="step-desc">Job updates row to running.</div></div>
-        <div class="step"><div class="step-nb">03</div><div class="step-title">Notify channel</div><div class="step-desc">DB emits the state change.</div></div>
-        <div class="step"><div class="step-nb">04</div><div class="step-title">Render update</div><div class="step-desc">Server streams status into the product UI.</div></div>
-      </div>
+  <div class="chrome"><div>Realtime &middot; The Mechanism</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">EVENTS AS ROW CHANGES</div>
+      <h2 class="h-xl" style="font-size:3.4vw">Triggers fire <code style="font-family:var(--mono);color:var(--volt-green)">pg_notify</code>. The database is the bus.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">LISTEN / NOTIFY ships in core Postgres. A trigger emits a payload on every row change you care about. No queue, no Redis, no Kafka, no second service to operate.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">Notifications travel inside the transaction. They only fire on COMMIT - so your event source can never disagree with your data.</div><span class="callout-src">at-most-once delivery on commit</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- 1. A trigger function shapes the payload as JSON.</span>
+          <span class="line">create function notify_file_embedded() returns trigger as $$</span>
+          <span class="line">begin</span>
+          <span class="line">&nbsp;&nbsp;perform pg_notify(</span>
+          <span class="line accent">&nbsp;&nbsp;&nbsp;&nbsp;'file_embedded',</span>
+          <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;json_build_object(</span>
+          <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'team_id', new.team_id,</span>
+          <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'file_id', new.id,</span>
+          <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'path',&nbsp;&nbsp;&nbsp;&nbsp;new.path</span>
+          <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;)::text</span>
+          <span class="line">&nbsp;&nbsp;);</span>
+          <span class="line">&nbsp;&nbsp;return new;</span>
+          <span class="line">end;</span>
+          <span class="line">$$ language plpgsql;</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 2. Attach the trigger to the column that matters.</span>
+          <span class="line">create trigger files_embedded_notify</span>
+          <span class="line">&nbsp;&nbsp;after update of embedded_at on files</span>
+          <span class="line">&nbsp;&nbsp;for each row execute function notify_file_embedded();</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 3. Now any UPDATE that sets embedded_at fires the channel.</span>
+          <span class="line">update files set embedded_at = now() where id = $1;</span>
+          <span class="line dim">-- &rarr; channel: file_embedded</span>
+          <span class="line dim">-- &rarr; payload: {&quot;team_id&quot;: ..., &quot;file_id&quot;: ..., &quot;path&quot;: &quot;src/auth/...&quot;}</span>
+        </div>
+      </v-clicks>
     </div>
   </div>
-  <div class="foot"><div class="title">Events as rows changing state</div><div>LISTEN / NOTIFY</div></div>
+  <div class="foot"><div class="title">No queue. No Redis. One transaction.</div><div>LISTEN / NOTIFY</div></div>
 </div>
 
 ---
@@ -876,21 +902,46 @@ class: 'light'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; APIs</div><ChromeCounter /></div>
-  <div class="frame grid-2-6-6" style="padding-top:6vh">
+  <div class="chrome"><div>Realtime &middot; The Subscriber</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
     <div>
-      <div class="kicker">APIS WITHOUT WRITING EVERY API</div>
-      <h2 class="h-xl" style="font-size:4.7vw">When your schema is deliberate, the API layer can be generated.</h2>
-      <p class="lead" style="margin-top:2vh">Tools like PostgREST and pg_graphql turn tables, views, functions, and policies into a data API. That changes the work: less endpoint glue, more schema design.</p>
-      <div class="chipline"><span class="chip">views</span><span class="chip">functions</span><span class="chip">policies</span><span class="chip">schema comments</span></div>
+      <div class="kicker">ONE CONNECTION, MANY CHANNELS</div>
+      <h2 class="h-xl" style="font-size:3.4vw">Subscribers hold one connection and read whenever the database speaks.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">A client runs <code style="font-family:var(--mono);color:#5e537c">LISTEN channel</code> once and Postgres pushes payloads down the same socket. Your Node, Bun, or Deno server forwards them straight into an RSC stream or a websocket.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">The fan-out lives in your server process, not in another service. One Postgres connection, every active tenant.</div><span class="callout-src">cheap fan-out, honest source</span></div>
     </div>
-    <div class="diagram">
-      <div class="node"><div class="label">Tables</div><div class="name">Source of truth</div><div class="desc">Normalized data and constraints.</div></div>
-      <div class="node hot"><div class="label">Views + functions</div><div class="name">Product contract</div><div class="desc">Stable shapes for the UI and agents.</div></div>
-      <div class="node"><div class="label">Generated API</div><div class="name">PostgREST / pg_graphql</div><div class="desc">HTTP or GraphQL without repetitive handlers.</div></div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- 1. From any psql session: subscribe to a channel.</span>
+          <span class="line"><span class="prompt">repo=#</span> listen file_embedded;</span>
+          <span class="line dim">LISTEN</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">// 2. Same connection in Node. Hold it open, push events upward.</span>
+          <span class="line">import { Client } from 'pg'</span>
+          <span class="line">const client = new Client()</span>
+          <span class="line">await client.connect()</span>
+          <span class="line">await client.query('listen file_embedded')</span>
+          <span class="line"></span>
+          <span class="line">client.on('notification', (msg) =&gt; {</span>
+          <span class="line accent">&nbsp;&nbsp;const event = JSON.parse(msg.payload)</span>
+          <span class="line">&nbsp;&nbsp;<span class="dim">// forward into SSE / websocket / RSC stream</span></span>
+          <span class="line">&nbsp;&nbsp;sseStreamForTeam(event.team_id).write(event)</span>
+          <span class="line">})</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 3. Trigger an event from another session. The first one prints it.</span>
+          <span class="line"><span class="prompt">repo=#</span> update files set embedded_at = now()</span>
+          <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where path = 'src/auth/middleware.ts';</span>
+          <span class="line dim">UPDATE 1</span>
+          <span class="line dim">Asynchronous notification &quot;file_embedded&quot; with payload</span>
+          <span class="line dim">&quot;{&quot;team_id&quot;: ..., &quot;file_id&quot;: ..., &quot;path&quot;: &quot;src/auth/middleware.ts&quot;}&quot;</span>
+        </div>
+      </v-clicks>
     </div>
   </div>
-  <div class="foot"><div class="title">API design shifts down into schema design</div><div>GENERATED API</div></div>
+  <div class="foot"><div class="title">LISTEN once. Read whenever Postgres speaks.</div><div>LISTEN / NOTIFY</div></div>
 </div>
 
 ---
