@@ -329,23 +329,74 @@ class: 'dark'
 
 <div class="slide-shell">
   <div class="chrome"><div>Capability &middot; Auth</div><ChromeCounter /></div>
-  <div class="frame grid-2-7-5" style="padding-top:6vh">
+  <div class="frame grid-2-7-5" style="padding-top:5vh">
     <div>
-      <div class="kicker">AUTH WITHOUT A SERVICE</div>
-      <h2 class="h-xl" style="font-size:4.7vw">Move authorization to the place that cannot forget it.</h2>
-      <p class="lead" style="margin-top:2vh">Row Level Security lets the database enforce tenant, team, and user boundaries. Your app can still authenticate users; Postgres owns what rows they may touch.</p>
-      <div class="callout" style="margin-top:5vh"><div class="q-big">The policy travels with every query, including the accidental ones.</div><span class="callout-src">RLS as data-plane guardrail</span></div>
+      <div class="kicker">AUTHENTICATION</div>
+      <h2 class="h-xl" style="font-size:4vw">Move authorization to the place that cannot forget it.</h2>
+      <p class="lead" style="margin-top:2vh">The database knows the tenant. Every query, every generated API, every MCP tool reads from the same policy.</p>
+      <div class="callout" style="margin-top:4vh"><div class="q-big">The policy travels with every query, including the accidental ones.</div><span class="callout-src">RLS as data-plane guardrail</span></div>
     </div>
-    <div class="terminal">
-      <span class="line">alter table documents enable row level security;</span>
+    <div class="terminal" style="padding:1.6vh 1.2vw">
+      <span class="line dim">-- A stable helper for the policies to call.</span>
+      <span class="line">create function current_team_id() returns uuid as $$</span>
+      <span class="line">  select nullif(current_setting('app.team_id', true), '')::uuid;</span>
+      <span class="line">$$ language sql stable;</span>
       <span class="line"></span>
-      <span class="line">create policy team_docs on documents</span>
-      <span class="line">  using (team_id = current_setting('app.team_id')::uuid);</span>
+      <span class="line dim">-- Enable + one declarative policy. That is the auth layer.</span>
+      <span class="line">alter table files enable row level security;</span>
       <span class="line"></span>
-      <span class="line dim">-- same rule for search, embeddings, admin screens</span>
+      <span class="line">create policy files_team on files</span>
+      <span class="line">  using (team_id = current_team_id());</span>
+      <span class="line"></span>
+      <span class="line dim">-- The app sets context once per request:</span>
+      <span class="line dim">-- &nbsp;&nbsp;withTenant(teamId, userId, async (tx) =&gt; { ... })</span>
     </div>
   </div>
   <div class="foot"><div class="title">Auth is not middleware when the data layer can enforce it</div><div>RLS</div></div>
+</div>
+
+---
+class: 'dark'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>Auth &middot; Caveats</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh">
+    <div class="kicker">WHEN RLS IS ON BUT NOT WORKING</div>
+    <h2 class="h-xl" style="font-size:3.6vw">Three line items that turn &ldquo;RLS is on&rdquo; into &ldquo;RLS works.&rdquo;</h2>
+    <p class="lead" style="max-width:78vw;margin-top:1.4vh">The policy looks right. The owner bypasses it, the update writes past it, or the pool leaks across it.</p>
+    <div class="compare" style="margin-top:3vh">
+      <div class="colbox">
+        <h3>01 &nbsp; The owner bypasses by default</h3>
+        <p>RLS only filters non-owners. The role that ran the migrations still reads every row in every tenant.</p>
+        <div class="terminal" style="margin-top:1.4vh;padding:1.2vh 1vw">
+          <span class="line dim">-- Force RLS on the owner too.</span>
+          <span class="line">alter table files</span>
+          <span class="line">  force row level security;</span>
+        </div>
+      </div>
+      <div class="colbox">
+        <h3>02 &nbsp; Forgetting WITH CHECK on writes</h3>
+        <p>USING filters reads. Without WITH CHECK, a user updates team_id and walks their row into another tenant.</p>
+        <div class="terminal" style="margin-top:1.4vh;padding:1.2vh 1vw">
+          <span class="line">create policy files_team on files</span>
+          <span class="line">  using&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(team_id = current_team_id())</span>
+          <span class="line warn">  with check (team_id = current_team_id());</span>
+        </div>
+      </div>
+      <div class="colbox">
+        <h3>03 &nbsp; SET (not SET LOCAL) leaks the pool</h3>
+        <p>Pool connections live across requests. A naked SET on app.team_id sticks around for the next checkout.</p>
+        <div class="terminal" style="margin-top:1.4vh;padding:1.2vh 1vw">
+          <span class="line">begin;</span>
+          <span class="line warn">&nbsp;&nbsp;set local app.team_id = '&lt;team&gt;';</span>
+          <span class="line dim">&nbsp;&nbsp;-- your queries</span>
+          <span class="line">commit;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div class="title">Enable is the first line, not the whole feature</div><div>RLS &middot; CAVEATS</div></div>
 </div>
 
 ---
