@@ -585,6 +585,144 @@ class: 'light'
 </div>
 
 ---
+class: 'dark'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>Capability &middot; Queues</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">BACKGROUND JOBS</div>
+      <h2 class="h-xl" style="font-size:3.6vw">The queue is a table.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">Three SQL primitives compose into a real queue: <code style="font-family:var(--mono);color:var(--volt-green)">FOR UPDATE SKIP LOCKED</code> for concurrent workers, transactions for atomic enqueue, <code style="font-family:var(--mono);color:var(--volt-green)">NOTIFY</code> for instant wake-up.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">Create the row, audit the event, enqueue the embedding. One transaction. One commit. No outbox.</div><span class="callout-src">atomic by default</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- 1. A queue is a table with a status column.</span>
+          <span class="line">create table jobs (</span>
+          <span class="line">&nbsp;&nbsp;id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uuid primary key default gen_random_uuid(),</span>
+          <span class="line">&nbsp;&nbsp;payload&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jsonb not null,</span>
+          <span class="line">&nbsp;&nbsp;status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text not null default 'queued',</span>
+          <span class="line">&nbsp;&nbsp;available_at&nbsp;&nbsp;timestamptz not null default now()</span>
+          <span class="line">);</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 2. SKIP LOCKED lets every worker claim a job, never the same one.</span>
+          <span class="line">select id, payload from jobs</span>
+          <span class="line">where status = 'queued' and available_at &lt;= now()</span>
+          <span class="line">order by available_at</span>
+          <span class="line accent">for update skip locked</span>
+          <span class="line">limit 1;</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 3. Enqueue inside the same transaction as the business write.</span>
+          <span class="line">begin;</span>
+          <span class="line">&nbsp;&nbsp;insert into files (...) returning id;</span>
+          <span class="line">&nbsp;&nbsp;insert into jobs (payload)</span>
+          <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;values (jsonb_build_object('file_id', $1));</span>
+          <span class="line">commit;</span>
+        </div>
+      </v-clicks>
+    </div>
+  </div>
+  <div class="foot"><div class="title">Queue, scheduler, outbox - all rows.</div><div>QUEUES</div></div>
+</div>
+
+---
+class: 'light'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>Capability &middot; pg_cron</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">SCHEDULED JOBS</div>
+      <h2 class="h-xl" style="font-size:3.6vw">pg_cron makes schedules a table too.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">An extension that turns cron expressions into rows. The database runs the schedule. No external scheduler, no Kubernetes CronJob, no surprise drift.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">Every row in <code style="font-family:var(--mono);color:#5e537c">cron.job</code> is a future tick of the database&rsquo;s heartbeat.</div><span class="callout-src">github.com/citusdata/pg_cron</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- 1. Install the extension once.</span>
+          <span class="line">create extension if not exists pg_cron;</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 2. Schedule a SQL command on a cron expression.</span>
+          <span class="line">select cron.schedule(</span>
+          <span class="line">&nbsp;&nbsp;'nightly-vacuum',</span>
+          <span class="line">&nbsp;&nbsp;'0 10 * * *',&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- 10:00 UTC, every day</span>
+          <span class="line">&nbsp;&nbsp;'vacuum analyze'</span>
+          <span class="line">);</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 3. Or call your own function.</span>
+          <span class="line">select cron.schedule(</span>
+          <span class="line">&nbsp;&nbsp;'archive-stale-runs',</span>
+          <span class="line">&nbsp;&nbsp;'0 3 * * 0',&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- 03:00 UTC every Sunday</span>
+          <span class="line">&nbsp;&nbsp;$$select archive_runs_older_than('30 days')$$</span>
+          <span class="line">);</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 4. See what is scheduled. Unschedule by name.</span>
+          <span class="line">select jobid, schedule, command from cron.job;</span>
+          <span class="line">select cron.unschedule('nightly-vacuum');</span>
+        </div>
+      </v-clicks>
+    </div>
+  </div>
+  <div class="foot"><div class="title">The schedule is a row. The DB is the cron.</div><div>PG_CRON</div></div>
+</div>
+
+---
+class: 'dark'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>Capability &middot; Graphile Worker</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">PRODUCTION QUEUES</div>
+      <h2 class="h-xl" style="font-size:3.4vw">One npm package. Every queue primitive.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">Graphile Worker takes the SKIP LOCKED + NOTIFY pattern, adds retries, cron, batching, and TypeScript task definitions. Same Postgres, same RLS, no operational hop.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">The job table is in your database. The worker is a binary. The producer is one line of SQL.</div><span class="callout-src">worker.graphile.org</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- tasks/embed_file.ts</span>
+          <span class="line">import type { Task } from 'graphile-worker'</span>
+          <span class="line"></span>
+          <span class="line">const embedFile: Task = async (payload, { logger }) =&gt; {</span>
+          <span class="line">&nbsp;&nbsp;const { fileId } = payload as { fileId: string }</span>
+          <span class="line">&nbsp;&nbsp;logger.info(`embedding file ${fileId}`)</span>
+          <span class="line">&nbsp;&nbsp;<span class="dim">// ... compute + upsert embedding</span></span>
+          <span class="line">}</span>
+          <span class="line">export default embedFile</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim"># One command. Connects to Postgres. Tails the queue.</span>
+          <span class="line"><span class="prompt">$</span> npx graphile-worker -c "postgres:///repo"</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- Producer side. Same transaction as the business write.</span>
+          <span class="line">begin;</span>
+          <span class="line">&nbsp;&nbsp;insert into files (path, content) values (...);</span>
+          <span class="line accent">&nbsp;&nbsp;perform graphile_worker.add_job(</span>
+          <span class="line accent">&nbsp;&nbsp;&nbsp;&nbsp;'embed_file',</span>
+          <span class="line accent">&nbsp;&nbsp;&nbsp;&nbsp;jsonb_build_object('fileId', new_file_id)</span>
+          <span class="line accent">&nbsp;&nbsp;);</span>
+          <span class="line">commit;</span>
+        </div>
+      </v-clicks>
+    </div>
+  </div>
+  <div class="foot"><div class="title">Job state beside product state. Atomic from day one.</div><div>GRAPHILE WORKER</div></div>
+</div>
+
+---
 class: 'light'
 ---
 
@@ -630,31 +768,6 @@ class: 'dark'
     </div>
   </div>
   <div class="foot"><div class="title">Events as rows changing state</div><div>LISTEN / NOTIFY</div></div>
-</div>
-
----
-class: 'light'
----
-
-<div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; Background Work</div><ChromeCounter /></div>
-  <div class="frame grid-2-7-5" style="padding-top:6vh">
-    <div>
-      <div class="kicker">BACKGROUND JOBS SIMPLIFIED</div>
-      <h2 class="h-xl" style="font-size:4.7vw">Queues become easier when the queue is allowed to be relational.</h2>
-      <p class="lead" style="margin-top:2vh">Graphile Worker and pg-boss use Postgres-native primitives for durable jobs, locking, retries, schedules, and transactional enqueue.</p>
-      <div class="callout" style="margin-top:5vh"><div class="q-big">Create the user, write the audit event, enqueue the embedding job: one transaction.</div><span class="callout-src">atomic product behavior</span></div>
-    </div>
-    <div class="terminal">
-      <span class="line">await sql.begin(async tx =&gt; {</span>
-      <span class="line">  await tx`insert into documents ...`;</span>
-      <span class="line">  await tx`select graphile_worker.add_job(</span>
-      <span class="line">    'embed_document', json_build_object('id', doc_id)</span>
-      <span class="line">  )`;</span>
-      <span class="line">});</span>
-    </div>
-  </div>
-  <div class="foot"><div class="title">Job state belongs beside product state</div><div>WORKERS</div></div>
 </div>
 
 ---
