@@ -24,6 +24,36 @@ Team UUID you'll need:
 
 ---
 
+## 0. What we're searching across
+
+Before the four queries, prove the table is real and the two search columns are wired up.
+
+```sql
+\d files
+```
+
+Look for these lines:
+- `embedding | vector(384)` &nbsp;and&nbsp; `tsv | tsvector ... generated always as ... stored`
+- Index list shows both: `files_embedding_idx hnsw (embedding vector_cosine_ops)` &nbsp;and&nbsp; `files_tsv_idx gin (tsv)`
+- A `Policies:` footer with `files_team USING ((team_id = current_team_id()))`
+
+Now show the rows the active tenant can see:
+
+```sql
+begin;
+  set local app.team_id = '11111111-1111-1111-1111-111111111111';
+  select path, language, length(content) as bytes
+  from files
+  order by path;
+commit;
+```
+
+Returns 5 BrowserOS files. The Acme `main.go` is hidden by RLS.
+
+Say: *"One table. One column for full-text, one column for vectors. Two indexes, one policy. Everything from here is one query against this."*
+
+---
+
 ## 1. Full-text search with `ts_rank`
 
 `websearch_to_tsquery` accepts Google-style queries (`-exclude`, `"phrase"`). `ts_rank` orders the hits by relevance.
