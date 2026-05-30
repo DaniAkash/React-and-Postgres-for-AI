@@ -1027,3 +1027,63 @@ class: 'hero light'
   </div>
   <div class="foot"><div class="title">You probably already have it installed</div><div>END</div></div>
 </div>
+
+---
+class: 'hero dark'
+---
+
+<div class="slide-shell">
+  <WebGLBackground variant="dark" />
+  <div class="chrome"><div>Thank you &middot; Connect</div><ChromeCounter /></div>
+  <div class="frame" style="display:grid;grid-template-columns:1.1fr .9fr;gap:5vw;align-items:center;height:100%">
+    <div>
+      <div class="kicker">END OF TRANSMISSION</div>
+      <h1 class="h-hero" style="font-size:7.4vw;line-height:0.95">Thank you.</h1>
+      <p class="lead" style="max-width:34vw;margin-top:2vh">Questions, war stories, counter-takes. Find me on any of these. The slides and the sample app are public.</p>
+    </div>
+    <div style="display:grid;gap:2vh">
+      <div class="contact-row">
+        <span class="contact-label">GITHUB</span>
+        <span class="contact-value">@DaniAkash</span>
+      </div>
+      <div class="contact-row">
+        <span class="contact-label">X</span>
+        <span class="contact-value">@dani_akash_</span>
+      </div>
+      <div class="contact-row">
+        <span class="contact-label">WEB</span>
+        <span class="contact-value">daniakash.com</span>
+      </div>
+      <div class="contact-row">
+        <span class="contact-label">SLIDES + APP</span>
+        <span class="contact-value" style="font-size:1.5vw">github.com/DaniAkash/React-and-Postgres-for-AI</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div class="title">React + Postgres &middot; The AI-Ready Stack You Already Know</div><div>Dani Akash</div></div>
+</div>
+
+<style>
+.contact-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4vh;
+  padding: 1.6vh 0;
+  border-top: 1px solid rgba(var(--paper-rgb), 0.18);
+}
+.contact-row:last-child { border-bottom: 1px solid rgba(var(--paper-rgb), 0.18); }
+.contact-label {
+  font-family: var(--mono);
+  font-size: max(11px, 0.82vw);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.contact-value {
+  font-family: var(--serif-en);
+  font-weight: 600;
+  font-size: 2.6vw;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+</style>
