@@ -473,6 +473,122 @@ class: 'light'
 ---
 
 <div class="slide-shell">
+  <div class="chrome"><div>Data &middot; Shapes</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">STRUCTURED + UNSTRUCTURED</div>
+      <h2 class="h-xl" style="font-size:3.6vw">Two shapes. One table.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">Postgres treats typed columns and JSONB documents as first-class on the same row. Same transaction, same RLS, same indexes. Pick the shape per field, not per table.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">When you don&rsquo;t know the schema yet, you put it in <code style="font-family:var(--mono);color:var(--volt-green)">jsonb</code>. When you do, you put it in a column. The query path is the same.</div><span class="callout-src">one table, one engine, two shapes</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <div class="walk-chunk">
+        <span class="line dim">-- One files table. Typed columns for what we know.</span>
+        <span class="line">create table files (</span>
+        <span class="line">&nbsp;&nbsp;id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uuid primary key,</span>
+        <span class="line">&nbsp;&nbsp;team_id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uuid not null,</span>
+        <span class="line">&nbsp;&nbsp;path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text not null,</span>
+        <span class="line">&nbsp;&nbsp;language&nbsp;&nbsp;&nbsp;&nbsp;text,</span>
+        <span class="line">&nbsp;&nbsp;size_bytes&nbsp;&nbsp;int&nbsp;&nbsp;not null,</span>
+        <span class="line">&nbsp;&nbsp;content&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text not null,</span>
+        <span class="line accent">&nbsp;&nbsp;metadata&nbsp;&nbsp;&nbsp;&nbsp;jsonb not null default '{}'&nbsp;&nbsp;-- per-row schema</span>
+        <span class="line">);</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div class="title">One table. Two shapes. Same machinery.</div><div>SHAPES</div></div>
+</div>
+
+---
+class: 'dark'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>Data &middot; Structured</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">TYPED COLUMNS</div>
+      <h2 class="h-xl" style="font-size:3.6vw">Filter. Join. Aggregate.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">Stable shapes the planner understands. Typed columns get composite indexes, foreign-key joins, and aggregates that the optimiser has been tuning for decades.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">When the shape is fixed and you query it the same way every time, a typed column is the cheapest thing in the engine.</div><span class="callout-src">structured = predictable plans</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- 1. Filter on typed columns. WHERE is the planner&rsquo;s lunch.</span>
+          <span class="line">select path, size_bytes</span>
+          <span class="line">from files</span>
+          <span class="line">where language = 'typescript'</span>
+          <span class="line">&nbsp;&nbsp;and size_bytes &lt; 1000;</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 2. Join the relational graph. Foreign keys are real.</span>
+          <span class="line">select r.name, count(f.*) as files</span>
+          <span class="line">from repos r</span>
+          <span class="line">left join files f on f.repo_id = r.id</span>
+          <span class="line">group by r.name;</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 3. Compose an index that matches the query.</span>
+          <span class="line">create index files_lang_size</span>
+          <span class="line">&nbsp;&nbsp;on files (language, size_bytes);</span>
+        </div>
+      </v-clicks>
+    </div>
+  </div>
+  <div class="foot"><div class="title">Stable shapes for stable plans.</div><div>STRUCTURED</div></div>
+</div>
+
+---
+class: 'light'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>Data &middot; Unstructured</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">JSONB</div>
+      <h2 class="h-xl" style="font-size:3.4vw">JSON, queryable. Indexed. Without leaving the table.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">One column holds anything a row needs. Postgres exposes operators to extract values, match shapes, and index across the whole document.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">Per-row schema. Per-row index. No second database. No new query language.</div><span class="callout-src">jsonb is a Postgres type, not a feature</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- 1. Insert a document into the jsonb column.</span>
+          <span class="line">insert into files (path, content, metadata)</span>
+          <span class="line">values (</span>
+          <span class="line">&nbsp;&nbsp;'src/auth.ts', '...',</span>
+          <span class="line">&nbsp;&nbsp;'{"exports": ["authMiddleware"], "loc": 28}'</span>
+          <span class="line">);</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 2. Extract with -&gt;&gt; and test paths with -&gt;</span>
+          <span class="line">select path, metadata-&gt;&gt;'loc' as loc</span>
+          <span class="line">from files</span>
+          <span class="line">where metadata-&gt;'exports' ? 'authMiddleware';</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 3. @&gt; asks "does this document contain this shape?"</span>
+          <span class="line">select path from files</span>
+          <span class="line">where metadata @&gt; '{"exports": ["authMiddleware"]}';</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 4. One GIN index makes every @&gt; query fast.</span>
+          <span class="line">create index files_metadata_gin</span>
+          <span class="line">&nbsp;&nbsp;on files using gin (metadata);</span>
+        </div>
+      </v-clicks>
+    </div>
+  </div>
+  <div class="foot"><div class="title">Per-row schema. Per-row index. Same engine.</div><div>JSONB</div></div>
+</div>
+
+---
+class: 'light'
+---
+
+<div class="slide-shell">
   <div class="chrome"><div>Capability &middot; Vectors</div><ChromeCounter /></div>
   <div class="frame grid-2-6-6" style="padding-top:6vh">
     <div>
