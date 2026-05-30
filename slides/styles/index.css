@@ -141,10 +141,16 @@ html, body { background: var(--ink); }
 /* Walkable terminals: progressive-reveal chunks for stage walkthroughs.
    Each chunk is a logically grouped block of lines (typically a comment
    + the code it describes); slidev's v-clicks wraps them so they appear
-   one click at a time. The +chunk selector spaces them out. */
+   one click at a time.
+   Larger font + lighter comment opacity than the default terminal so the
+   code stays readable from the back of a conference room. */
 .terminal.walkable { line-height: 1.7; }
-.terminal.walkable .line { line-height: 1.7; }
-.terminal.walkable .walk-chunk + .walk-chunk { margin-top: 1.6vh; }
+.terminal.walkable .line {
+  line-height: 1.65;
+  font-size: max(15px, 1.2vw);
+}
+.terminal.walkable .dim { color: #b1bac4; }
+.terminal.walkable .walk-chunk + .walk-chunk { margin-top: 2vh; }
 
 /* ============ Chip ============ */
 .chipline {

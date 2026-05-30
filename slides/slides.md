@@ -329,14 +329,14 @@ class: 'dark'
 
 <div class="slide-shell">
   <div class="chrome"><div>Capability &middot; Auth</div><ChromeCounter /></div>
-  <div class="frame grid-2-7-5" style="padding-top:5vh">
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
     <div>
       <div class="kicker">AUTHENTICATION</div>
-      <h2 class="h-xl" style="font-size:4vw">Move authorization to the place that cannot forget it.</h2>
-      <p class="lead" style="margin-top:2vh">The database knows the tenant. Every query, every generated API, every MCP tool reads from the same policy.</p>
-      <div class="callout" style="margin-top:4vh"><div class="q-big">The policy travels with every query, including the accidental ones.</div><span class="callout-src">RLS as data-plane guardrail</span></div>
+      <h2 class="h-xl" style="font-size:3.2vw">Move authorization to the place that cannot forget it.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">The database knows the tenant. Every query, every generated API, every MCP tool reads from the same policy.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">The policy travels with every query, including the accidental ones.</div><span class="callout-src">RLS as data-plane guardrail</span></div>
     </div>
-    <div class="terminal walkable" style="padding:1.8vh 1.2vw">
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
       <v-clicks>
         <div class="walk-chunk">
           <span class="line dim">-- A stable helper for the policies to call.</span>
