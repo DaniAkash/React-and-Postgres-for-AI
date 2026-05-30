@@ -336,20 +336,28 @@ class: 'dark'
       <p class="lead" style="margin-top:2vh">The database knows the tenant. Every query, every generated API, every MCP tool reads from the same policy.</p>
       <div class="callout" style="margin-top:4vh"><div class="q-big">The policy travels with every query, including the accidental ones.</div><span class="callout-src">RLS as data-plane guardrail</span></div>
     </div>
-    <div class="terminal" style="padding:1.6vh 1.2vw">
-      <span class="line dim">-- A stable helper for the policies to call.</span>
-      <span class="line">create function current_team_id() returns uuid as $$</span>
-      <span class="line">  select nullif(current_setting('app.team_id', true), '')::uuid;</span>
-      <span class="line">$$ language sql stable;</span>
-      <span class="line"></span>
-      <span class="line dim">-- Enable + one declarative policy. That is the auth layer.</span>
-      <span class="line">alter table files enable row level security;</span>
-      <span class="line"></span>
-      <span class="line">create policy files_team on files</span>
-      <span class="line">  using (team_id = current_team_id());</span>
-      <span class="line"></span>
-      <span class="line dim">-- The app sets context once per request:</span>
-      <span class="line dim">-- &nbsp;&nbsp;withTenant(teamId, userId, async (tx) =&gt; { ... })</span>
+    <div class="terminal walkable" style="padding:1.8vh 1.2vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- A stable helper for the policies to call.</span>
+          <span class="line">create function current_team_id() returns uuid as $$</span>
+          <span class="line">&nbsp;&nbsp;select nullif(current_setting('app.team_id', true), '')::uuid;</span>
+          <span class="line">$$ language sql stable;</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- Enable RLS. The owner bypass is covered on the next slide.</span>
+          <span class="line">alter table files enable row level security;</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- One declarative policy. That is the auth layer.</span>
+          <span class="line">create policy files_team on files</span>
+          <span class="line">&nbsp;&nbsp;using (team_id = current_team_id());</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- The app sets context once per request:</span>
+          <span class="line dim">--&nbsp;&nbsp;withTenant(teamId, userId, async (tx) =&gt; { ... })</span>
+        </div>
+      </v-clicks>
     </div>
   </div>
   <div class="foot"><div class="title">Auth is not middleware when the data layer can enforce it</div><div>RLS</div></div>

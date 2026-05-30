@@ -138,6 +138,14 @@ html, body { background: var(--ink); }
 .terminal .warn   { color: #ffba00; }
 .terminal .bad    { color: #fb565b; }
 
+/* Walkable terminals: progressive-reveal chunks for stage walkthroughs.
+   Each chunk is a logically grouped block of lines (typically a comment
+   + the code it describes); slidev's v-clicks wraps them so they appear
+   one click at a time. The +chunk selector spaces them out. */
+.terminal.walkable { line-height: 1.7; }
+.terminal.walkable .line { line-height: 1.7; }
+.terminal.walkable .walk-chunk + .walk-chunk { margin-top: 1.6vh; }
+
 /* ============ Chip ============ */
 .chipline {
   display: flex;
