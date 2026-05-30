@@ -732,19 +732,22 @@ class: 'light'
     <div>
       <div class="kicker">SEARCH FOR RAG</div>
       <h2 class="h-xl" style="font-size:3.4vw">RAG is retrieval. Postgres is good at retrieval.</h2>
-      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">When the model needs grounded information, you do not call an API. You query your own data. Postgres ships two complementary search modes on the same row.</p>
-      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">Full-text for the words you can name. Vectors for the meaning you cannot.</div><span class="callout-src">one table, two indexes, one query</span></div>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">When the model needs grounded information, you do not call an API. You query your own data. Full-text is built into core Postgres. pgvector is an extension &mdash; declared like a built-in type, indexed like a built-in column, planned like a built-in operator.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">Full-text for the words you can name. Vectors for the meaning you cannot.</div><span class="callout-src">tsvector in core &middot; pgvector via extension</span></div>
     </div>
     <div class="terminal walkable" style="padding:2vh 1.4vw">
       <div class="walk-chunk">
+        <span class="line dim">-- pgvector is an extension; full-text is already in core.</span>
+        <span class="line accent">create extension if not exists vector;</span>
+        <span class="line"></span>
         <span class="line dim">-- One files table. Two search columns side by side.</span>
         <span class="line">create table files (</span>
         <span class="line">&nbsp;&nbsp;id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uuid primary key,</span>
         <span class="line">&nbsp;&nbsp;path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text not null,</span>
         <span class="line">&nbsp;&nbsp;content&nbsp;&nbsp;&nbsp;text not null,</span>
-        <span class="line accent">&nbsp;&nbsp;tsv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tsvector generated always as</span>
-        <span class="line accent">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(to_tsvector('english', content)) stored,</span>
-        <span class="line accent">&nbsp;&nbsp;embedding&nbsp;vector(384)</span>
+        <span class="line">&nbsp;&nbsp;tsv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tsvector generated always as</span>
+        <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(to_tsvector('english', content)) stored,</span>
+        <span class="line">&nbsp;&nbsp;embedding&nbsp;vector(384)</span>
         <span class="line">);</span>
         <span class="line"></span>
         <span class="line dim">-- One index per search shape.</span>
@@ -753,7 +756,7 @@ class: 'light'
       </div>
     </div>
   </div>
-  <div class="foot"><div class="title">Same row, two retrieval shapes.</div><div>SEARCH</div></div>
+  <div class="foot"><div class="title">One in core, one as an extension. Same row, same plan.</div><div>SEARCH</div></div>
 </div>
 
 ---
