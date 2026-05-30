@@ -727,24 +727,122 @@ class: 'light'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; Vectors</div><ChromeCounter /></div>
-  <div class="frame grid-2-6-6" style="padding-top:6vh">
+  <div class="chrome"><div>Search &middot; Two Shapes</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
     <div>
-      <div class="kicker">VECTOR SEARCH WITHOUT A VECTOR DATABASE</div>
-      <h2 class="h-xl" style="font-size:4.7vw">Embeddings are more useful when they stay next to your rows.</h2>
-      <p class="lead" style="margin-top:2vh">With pgvector, semantic similarity can participate in normal SQL: tenant filters, joins, recency windows, permissions, ranking, and transactions.</p>
-      <div class="chipline"><span class="chip">embedding</span><span class="chip">metadata</span><span class="chip">tenant_id</span><span class="chip">created_at</span><span class="chip">visibility</span></div>
+      <div class="kicker">SEARCH FOR RAG</div>
+      <h2 class="h-xl" style="font-size:3.4vw">RAG is retrieval. Postgres is good at retrieval.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">When the model needs grounded information, you do not call an API. You query your own data. Postgres ships two complementary search modes on the same row.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">Full-text for the words you can name. Vectors for the meaning you cannot.</div><span class="callout-src">one table, two indexes, one query</span></div>
     </div>
-    <div class="terminal">
-      <span class="line">select id, title</span>
-      <span class="line">from documents</span>
-      <span class="line">where workspace_id = $1</span>
-      <span class="line">order by embedding &lt;-&gt; $2</span>
-      <span class="line">limit 8;</span>
-      <span class="line dim" style="margin-top:2vh">Semantic search, still relational.</span>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <div class="walk-chunk">
+        <span class="line dim">-- One files table. Two search columns side by side.</span>
+        <span class="line">create table files (</span>
+        <span class="line">&nbsp;&nbsp;id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uuid primary key,</span>
+        <span class="line">&nbsp;&nbsp;path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text not null,</span>
+        <span class="line">&nbsp;&nbsp;content&nbsp;&nbsp;&nbsp;text not null,</span>
+        <span class="line accent">&nbsp;&nbsp;tsv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tsvector generated always as</span>
+        <span class="line accent">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(to_tsvector('english', content)) stored,</span>
+        <span class="line accent">&nbsp;&nbsp;embedding&nbsp;vector(384)</span>
+        <span class="line">);</span>
+        <span class="line"></span>
+        <span class="line dim">-- One index per search shape.</span>
+        <span class="line">create index files_tsv_idx on files using gin&nbsp;&nbsp;(tsv);</span>
+        <span class="line">create index files_vec_idx on files using hnsw (embedding vector_cosine_ops);</span>
+      </div>
     </div>
   </div>
-  <div class="foot"><div class="title">The join is the product feature</div><div>PGVECTOR</div></div>
+  <div class="foot"><div class="title">Same row, two retrieval shapes.</div><div>SEARCH</div></div>
+</div>
+
+---
+class: 'dark'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>Search &middot; Full-text</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">WORDS YOU CAN NAME</div>
+      <h2 class="h-xl" style="font-size:3.6vw">Tokenise. Index. Rank.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">Postgres normalises text to lexemes, indexes them with GIN, and ranks matches with the same SQL planner that filters your business rows.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">When the user types a function name, an error code, a product name: full-text is faster than your model.</div><span class="callout-src">tsvector + websearch_to_tsquery</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- 1. websearch_to_tsquery handles &quot;auth -login&quot; naturally.</span>
+          <span class="line">select path, ts_rank(tsv, q) as rank</span>
+          <span class="line">from files, websearch_to_tsquery('english', 'auth middleware') q</span>
+          <span class="line">where tsv @@ q</span>
+          <span class="line">order by rank desc</span>
+          <span class="line">limit 5;</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 2. ts_headline returns the matched terms in context.</span>
+          <span class="line">select path,</span>
+          <span class="line">&nbsp;&nbsp;ts_headline('english', content,</span>
+          <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;websearch_to_tsquery('english', 'middleware'))</span>
+          <span class="line">from files</span>
+          <span class="line">where tsv @@ websearch_to_tsquery('english', 'middleware');</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 3. Compose with structured filters in one query plan.</span>
+          <span class="line">select path from files</span>
+          <span class="line">where language = 'typescript'</span>
+          <span class="line">&nbsp;&nbsp;and tsv @@ phraseto_tsquery('english', 'auth middleware');</span>
+        </div>
+      </v-clicks>
+    </div>
+  </div>
+  <div class="foot"><div class="title">Lexemes, ranked, indexed in core.</div><div>TSVECTOR</div></div>
+</div>
+
+---
+class: 'light'
+---
+
+<div class="slide-shell">
+  <div class="chrome"><div>Search &middot; Vectors + Hybrid</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">MEANING YOU CANNOT NAME</div>
+      <h2 class="h-xl" style="font-size:3.2vw">Vectors for the questions users phrase their own way.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">pgvector adds the <code style="font-family:var(--mono);color:#5e537c">vector</code> type, distance operators (<code style="font-family:var(--mono);color:#5e537c">&lt;-&gt;</code>, <code style="font-family:var(--mono);color:#5e537c">&lt;=&gt;</code>, <code style="font-family:var(--mono);color:#5e537c">&lt;#&gt;</code>), and HNSW indexes. Semantic similarity is now a column.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">Hybrid is the win: rank by text + vector, filter by tenant + freshness, all in one plan, all under one policy.</div><span class="callout-src">RAG = retrieval, not magic</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- 1. Nearest neighbour with cosine distance.</span>
+          <span class="line">select path, 1 - (embedding &lt;=&gt; $1) as similarity</span>
+          <span class="line">from files</span>
+          <span class="line">where team_id = current_team_id()</span>
+          <span class="line">order by embedding &lt;=&gt; $1</span>
+          <span class="line">limit 5;</span>
+        </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 2. Hybrid: blend text rank and vector rank in one query.</span>
+          <span class="line">with text_hits as (</span>
+          <span class="line">&nbsp;&nbsp;select id, ts_rank(tsv, q) as r</span>
+          <span class="line">&nbsp;&nbsp;from files, websearch_to_tsquery('english', $1) q</span>
+          <span class="line">&nbsp;&nbsp;where tsv @@ q order by r desc limit 20</span>
+          <span class="line">), vec_hits as (</span>
+          <span class="line">&nbsp;&nbsp;select id, 1 - (embedding &lt;=&gt; $2) as r</span>
+          <span class="line">&nbsp;&nbsp;from files order by embedding &lt;=&gt; $2 limit 20</span>
+          <span class="line">)</span>
+          <span class="line">select f.path,</span>
+          <span class="line accent">&nbsp;&nbsp;coalesce(t.r,0)*0.5 + coalesce(v.r,0)*0.5 as rank</span>
+          <span class="line">from files f</span>
+          <span class="line">left join text_hits t on t.id = f.id</span>
+          <span class="line">left join vec_hits&nbsp;&nbsp;v on v.id = f.id</span>
+          <span class="line">order by rank desc limit 10;</span>
+        </div>
+      </v-clicks>
+    </div>
+  </div>
+  <div class="foot"><div class="title">Two indexes, one rank, one tenant, one query.</div><div>PGVECTOR + HYBRID</div></div>
 </div>
 
 ---
@@ -768,28 +866,6 @@ class: 'dark'
     </div>
   </div>
   <div class="foot"><div class="title">Events as rows changing state</div><div>LISTEN / NOTIFY</div></div>
-</div>
-
----
-class: 'dark'
----
-
-<div class="slide-shell">
-  <div class="chrome"><div>Capability &middot; Retrieval</div><ChromeCounter /></div>
-  <div class="frame" style="padding-top:5vh">
-    <div class="kicker">RAG WITHOUT THE COMPLEXITY</div>
-    <h2 class="h-xl" style="font-size:4.8vw">Most retrieval is not pure vector search. It is filtered, ranked, permissioned search.</h2>
-    <div class="compare">
-      <div class="colbox"><h3>Full-text</h3><p>Exact terms, product names, issue IDs, table names, API references. Great when words matter.</p></div>
-      <div class="colbox"><h3>Vectors</h3><p>Semantic neighbors, paraphrases, intent matching, "find things like this". Great when meaning matters.</p></div>
-      <div class="colbox"><h3>SQL filters</h3><p>Workspace, user role, freshness, document type, state, source, and audit rules. Great when correctness matters.</p></div>
-    </div>
-    <div class="terminal" style="margin-top:5vh">
-      <span class="line">rank = text_rank * 0.45 + vector_rank * 0.45 + freshness * 0.10</span>
-      <span class="line dim">Hybrid retrieval is a product policy, not just an index choice.</span>
-    </div>
-  </div>
-  <div class="foot"><div class="title">RAG is retrieval plus rules</div><div>HYBRID SEARCH</div></div>
 </div>
 
 ---
