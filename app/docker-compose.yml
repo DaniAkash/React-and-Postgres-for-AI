@@ -1,0 +1,44 @@
+# Two services. Postgres holds the schema + RLS policies; PostgREST is the
+# auto-generated REST API that reads the same tables under the same policies.
+#
+# pg_graphql is a Postgres extension, not a standalone service - it would
+# need a custom Postgres image that pre-installs it (or Supabase's bundled
+# image). Left out here so the demo runs against vanilla pgvector/pg16.
+# Slide 14 can show pg_graphql via a screenshot or a one-off `\dx` later.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: repo
+      POSTGRES_PASSWORD: repo
+      POSTGRES_DB: repo
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U repo -d repo"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  # REST API auto-derived from the schema. Read at:
+  #   http://localhost:3001/repos
+  #   http://localhost:3001/files?path=like.*auth*
+  postgrest:
+    image: postgrest/postgrest:v12.2.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://repo:repo@postgres:5432/repo
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: repo
+      PGRST_JWT_SECRET: dev-secret-please-rotate
+    ports:
+      - "3001:3000"
+
+volumes:
+  pgdata:

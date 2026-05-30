@@ -1,15 +1,31 @@
 {
-  "name": "react-and-postgres-for-ai-app",
-  "module": "index.ts",
-  "type": "module",
+  "name": "repo-companion",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "bun run index.ts"
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d",
+    "db:psql": "docker compose exec postgres psql -U repo -d repo",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.36.0",
+    "next": "^15.0.0",
+    "pg": "^8.13.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.11.10",
+    "@types/react": "19.0.0",
+    "@types/react-dom": "19.0.0",
+    "drizzle-kit": "^0.30.0",
+    "typescript": "^5.7.0"
   }
 }
