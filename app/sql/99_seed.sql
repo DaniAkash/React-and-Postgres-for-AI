@@ -78,3 +78,23 @@ insert into files (repo_id, team_id, path, language, size_bytes, sha, content, m
    'sha256:def1', 'package main; import "fmt"',
    '{"module": "main"}',
    array_fill(0::real, array[384])::vector, now());
+
+-- One BrowserOS chat with two messages so the join example on slide 10
+-- has something to join across. Acme is intentionally chat-less so the
+-- contrast is visible.
+insert into chats (id, team_id, repo_id, user_id, title) values
+  ('cccc1111-cccc-1111-cccc-111111111111',
+   '11111111-1111-1111-1111-111111111111',
+   'aaaa1111-aaaa-1111-aaaa-111111111111',
+   '00000000-0000-0000-0000-000000000001',
+   'Where is the auth middleware?');
+
+insert into messages (chat_id, team_id, role, content) values
+  ('cccc1111-cccc-1111-cccc-111111111111',
+   '11111111-1111-1111-1111-111111111111',
+   'user',
+   'Find any auth-related code in this repo.'),
+  ('cccc1111-cccc-1111-cccc-111111111111',
+   '11111111-1111-1111-1111-111111111111',
+   'assistant',
+   'I see src/auth/middleware.ts. The auth handler is exported there.');
