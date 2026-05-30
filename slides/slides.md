@@ -339,22 +339,25 @@ class: 'dark'
     <div class="terminal walkable" style="padding:2vh 1.4vw">
       <v-clicks>
         <div class="walk-chunk">
-          <span class="line dim">-- A stable helper for the policies to call.</span>
-          <span class="line">create function current_team_id() returns uuid as $$</span>
-          <span class="line">&nbsp;&nbsp;select nullif(current_setting('app.team_id', true), '')::uuid;</span>
-          <span class="line">$$ language sql stable;</span>
+          <span class="line dim">-- 1. The table we are protecting. One column does the work.</span>
+          <span class="line">create table files (</span>
+          <span class="line">&nbsp;&nbsp;id       uuid primary key,</span>
+          <span class="line accent">&nbsp;&nbsp;team_id&nbsp;&nbsp;uuid not null,&nbsp;&nbsp;-- the tenancy key</span>
+          <span class="line">&nbsp;&nbsp;path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text not null,</span>
+          <span class="line">&nbsp;&nbsp;content&nbsp;&nbsp;text not null</span>
+          <span class="line">);</span>
         </div>
         <div class="walk-chunk">
-          <span class="line dim">-- Enable RLS. The owner bypass is covered on the next slide.</span>
+          <span class="line dim">-- 2. Turn RLS on. By default, nothing is allowed.</span>
           <span class="line">alter table files enable row level security;</span>
         </div>
         <div class="walk-chunk">
-          <span class="line dim">-- One declarative policy. That is the auth layer.</span>
+          <span class="line dim">-- 3. One declarative policy. That is the auth layer.</span>
           <span class="line">create policy files_team on files</span>
-          <span class="line">&nbsp;&nbsp;using (team_id = current_team_id());</span>
+          <span class="line">&nbsp;&nbsp;using (team_id = current_setting('app.team_id')::uuid);</span>
         </div>
         <div class="walk-chunk">
-          <span class="line dim">-- The app sets context once per request:</span>
+          <span class="line dim">-- 4. The app sets the session variable per request.</span>
           <span class="line dim">--&nbsp;&nbsp;withTenant(teamId, userId, async (tx) =&gt; { ... })</span>
         </div>
       </v-clicks>
@@ -388,8 +391,8 @@ class: 'dark'
         <p>USING filters reads. Without WITH CHECK, a user updates team_id and walks their row into another tenant.</p>
         <div class="terminal" style="margin-top:1.4vh;padding:1.2vh 1vw">
           <span class="line">create policy files_team on files</span>
-          <span class="line">  using&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(team_id = current_team_id())</span>
-          <span class="line warn">  with check (team_id = current_team_id());</span>
+          <span class="line">  using&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(team_id = current_setting('app.team_id')::uuid)</span>
+          <span class="line warn">  with check (team_id = current_setting('app.team_id')::uuid);</span>
         </div>
       </div>
       <div class="colbox">
