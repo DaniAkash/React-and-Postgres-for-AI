@@ -371,43 +371,43 @@ class: 'dark'
 ---
 
 <div class="slide-shell">
-  <div class="chrome"><div>Auth &middot; Caveats</div><ChromeCounter /></div>
-  <div class="frame" style="padding-top:4vh">
-    <div class="kicker">WHEN RLS IS ON BUT NOT WORKING</div>
-    <h2 class="h-xl" style="font-size:3.6vw">Three line items that turn &ldquo;RLS is on&rdquo; into &ldquo;RLS works.&rdquo;</h2>
-    <p class="lead" style="max-width:78vw;margin-top:1.4vh">The policy looks right. The owner bypasses it, the update writes past it, or the pool leaks across it.</p>
-    <div class="compare" style="margin-top:3vh">
-      <div class="colbox">
-        <h3>01 &nbsp; The owner bypasses by default</h3>
-        <p>RLS only filters non-owners. The role that ran the migrations still reads every row in every tenant.</p>
-        <div class="terminal" style="margin-top:1.4vh;padding:1.2vh 1vw">
-          <span class="line dim">-- Force RLS on the owner too.</span>
-          <span class="line">alter table files</span>
-          <span class="line">  force row level security;</span>
+  <div class="chrome"><div>Auth &middot; In Practice</div><ChromeCounter /></div>
+  <div class="frame" style="padding-top:4vh;display:grid;grid-template-columns:5fr 7fr;gap:3vw;align-items:start">
+    <div>
+      <div class="kicker">WHAT THE POLICY DOES</div>
+      <h2 class="h-xl" style="font-size:3.2vw">Read, write, join, mistake. The policy stays put.</h2>
+      <p class="lead" style="font-size:1.4vw;margin-top:1.6vh">Plain SQL. No middleware to forget, no helper to call. Postgres scopes reads, blocks rogue writes, and follows every join.</p>
+      <div class="callout" style="margin-top:3vh"><div class="q-big" style="font-size:1.3vw">Even the bug you would have shipped against another tenant just &hellip; does not.</div><span class="callout-src">forgotten WHERE, contained</span></div>
+    </div>
+    <div class="terminal walkable" style="padding:2vh 1.4vw">
+      <v-clicks>
+        <div class="walk-chunk">
+          <span class="line dim">-- 1. A read with no WHERE clause.</span>
+          <span class="line">select count(*) from files;</span>
+          <span class="line dim">-- &#8680;&nbsp;&nbsp;3&nbsp;&nbsp;(your team only; 3 hidden)</span>
         </div>
-      </div>
-      <div class="colbox">
-        <h3>02 &nbsp; Forgetting WITH CHECK on writes</h3>
-        <p>USING filters reads. Without WITH CHECK, a user updates team_id and walks their row into another tenant.</p>
-        <div class="terminal" style="margin-top:1.4vh;padding:1.2vh 1vw">
-          <span class="line">create policy files_team on files</span>
-          <span class="line">  using&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(team_id = current_setting('app.team_id')::uuid)</span>
-          <span class="line warn">  with check (team_id = current_setting('app.team_id')::uuid);</span>
+        <div class="walk-chunk">
+          <span class="line dim">-- 2. Try to plant a row in another tenant.</span>
+          <span class="line">insert into files (team_id, path, content)</span>
+          <span class="line">values ('&lt;other-team&gt;', 'evil.ts', 'leak');</span>
+          <span class="line bad">-- &#10006; ERROR: new row violates row-level security policy</span>
         </div>
-      </div>
-      <div class="colbox">
-        <h3>03 &nbsp; SET (not SET LOCAL) leaks the pool</h3>
-        <p>Pool connections live across requests. A naked SET on app.team_id sticks around for the next checkout.</p>
-        <div class="terminal" style="margin-top:1.4vh;padding:1.2vh 1vw">
-          <span class="line">begin;</span>
-          <span class="line warn">&nbsp;&nbsp;set local app.team_id = '&lt;team&gt;';</span>
-          <span class="line dim">&nbsp;&nbsp;-- your queries</span>
-          <span class="line">commit;</span>
+        <div class="walk-chunk">
+          <span class="line dim">-- 3. Joins respect RLS on every joined table.</span>
+          <span class="line">select c.title, count(m.*) as msgs</span>
+          <span class="line">from chats c join messages m on m.chat_id = c.id</span>
+          <span class="line">group by c.title;</span>
+          <span class="line dim">-- &#8680;&nbsp;&nbsp;Only chats and messages your team can see.</span>
         </div>
-      </div>
+        <div class="walk-chunk">
+          <span class="line dim">-- 4. A developer forgets a WHERE clause.</span>
+          <span class="line">update files set archived_at = now();</span>
+          <span class="line dim">-- &#8680;&nbsp;&nbsp;Only YOUR team's files. The policy is the floor.</span>
+        </div>
+      </v-clicks>
     </div>
   </div>
-  <div class="foot"><div class="title">Enable is the first line, not the whole feature</div><div>RLS &middot; CAVEATS</div></div>
+  <div class="foot"><div class="title">Plain SQL. The policy travels with it.</div><div>RLS &middot; IN PRACTICE</div></div>
 </div>
 
 ---
