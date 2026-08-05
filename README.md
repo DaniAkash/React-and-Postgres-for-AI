@@ -4,6 +4,10 @@ Slides and showcase app for the talk **"React + Postgres - The AI-Ready Stack Yo
 
 > Modern web apps that deal with AI workloads tend to accumulate services like a junk drawer accumulates batteries. PostgreSQL paired with React Server Components removes most of that sprawl.
 
+**Event:** [Expert Talks Chennai](https://www.meetup.com/expert-talks-chennai/events/314841617/)
+
+**Recording:** [Watch on YouTube](https://youtu.be/O9r2SeC6hw8)
+
 ## Repo layout
 
 ```
